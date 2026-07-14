@@ -1,0 +1,335 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Noto+Serif+Thai:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --font-sarabun: "Sarabun", sans-serif;
+  --font-thai-serif: "Noto Serif Thai", serif;
+  --gold: #ea9e2c;
+  --gold-light: #fbd076;
+  --gold-dark: #c47c06;
+  --maroon: #5c294f;
+  --maroon-deep: #404142;
+  --silk: #fbfaf8;
+  /* Thai temple accent colors */
+  --jade: #1a6b5a;
+  --jade-light: #2d9e7f;
+  --saffron: #c97920;
+  --saffron-light: #f0a030;
+  --crimson: #8b1a1a;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: var(--font-sarabun), sans-serif;
+}
+
+body {
+  background-color: var(--silk);
+  color: var(--maroon-deep);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Use Noto Serif Thai for all headings */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-thai-serif), var(--font-sarabun), sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f9ede7;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 3px;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Glass card */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ════════════════════════════════════════════════════
+   ลวดลายไทย — THAI FABRIC DESIGN SYSTEM
+   ════════════════════════════════════════════════════ */
+
+/* Thai ikat / Matmee diamond background pattern */
+.thai-diamond-bg,
+.fabric-texture {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpolygon points='20%2C2 38%2C20 20%2C38 2%2C20' fill='none' stroke='%23d4af37' stroke-width='1' stroke-opacity='0.28'/%3E%3Cpolygon points='20%2C9 31%2C20 20%2C31 9%2C20' fill='none' stroke='%23d4af37' stroke-width='0.5' stroke-opacity='0.12'/%3E%3Cpolygon points='20%2C14 26%2C20 20%2C26 14%2C20' fill='%23d4af37' fill-opacity='0.12'/%3E%3C/svg%3E");
+  background-size: 40px 40px;
+}
+
+/* ── Lai Kanok (ลายกนก) — traditional Thai flame/lotus motif ─ */
+.lai-kanok-bg {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='80'%3E%3C!-- Main kanok flame --%3E%3Cpath d='M30%2C6 C34%2C14 38%2C26 36%2C40 C34%2C52 30%2C58 30%2C58 C30%2C58 26%2C52 24%2C40 C22%2C26 26%2C14 30%2C6Z' fill='none' stroke='%23d4af37' stroke-width='0.9' stroke-opacity='0.22'/%3E%3C!-- Inner petal --%3E%3Cpath d='M30%2C14 C33%2C20 35%2C30 33%2C40 C32%2C47 30%2C51 30%2C51 C30%2C51 28%2C47 27%2C40 C25%2C30 27%2C20 30%2C14Z' fill='%23d4af37' fill-opacity='0.08'/%3E%3C!-- Curl base --%3E%3Cellipse cx='30' cy='60' rx='5' ry='3' fill='none' stroke='%23d4af37' stroke-width='0.6' stroke-opacity='0.18'/%3E%3C!-- Side small kanok (offset row) --%3E%3Cpath d='M8%2C46 C11%2C51 13%2C58 11%2C64 C10%2C68 8%2C70 8%2C70 C8%2C70 6%2C68 5%2C64 C3%2C58 5%2C51 8%2C46Z' fill='none' stroke='%23d4af37' stroke-width='0.7' stroke-opacity='0.15'/%3E%3Cpath d='M52%2C46 C55%2C51 57%2C58 55%2C64 C54%2C68 52%2C70 52%2C70 C52%2C70 50%2C68 49%2C64 C47%2C58 49%2C51 52%2C46Z' fill='none' stroke='%23d4af37' stroke-width='0.7' stroke-opacity='0.15'/%3E%3C/svg%3E");
+  background-size: 60px 80px;
+}
+
+/* ── Marquee (infinite scroll) animation for technique band ── */
+@keyframes marqueeScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 22s linear infinite;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* ── Lotus section divider ──────────────────────────────────── */
+.thai-lotus-hr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0.75rem auto;
+}
+.thai-lotus-hr::before,
+.thai-lotus-hr::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.5));
+}
+.thai-lotus-hr::after {
+  background: linear-gradient(to left, transparent, rgba(212, 175, 55, 0.5));
+}
+
+/* ── Kanok corner ornament (for section headings) ───────────── */
+/* Replaced with inline SVG — see KanokDivider component */
+
+/* ── Thai woven fabric cross-hatch (denser version) ─────────── */
+.thai-weave-bg {
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(212, 175, 55, 0.07) 0px,
+      rgba(212, 175, 55, 0.07) 1px,
+      transparent 1px,
+      transparent 8px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(82, 34, 26, 0.05) 0px,
+      rgba(82, 34, 26, 0.05) 1px,
+      transparent 1px,
+      transparent 8px
+    );
+}
+
+/* Thai silk diagonal crosshatch weave */
+.thai-silk-bg {
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(212, 175, 55, 0.055) 0px,
+      rgba(212, 175, 55, 0.055) 1px,
+      transparent 1px,
+      transparent 13px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(212, 175, 55, 0.055) 0px,
+      rgba(212, 175, 55, 0.055) 1px,
+      transparent 1px,
+      transparent 13px
+    );
+}
+
+/* Thai horizontal woven stripe (like physical weave fabric) */
+.thai-stripe-bg {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 6px,
+    rgba(212, 175, 55, 0.045) 6px,
+    rgba(212, 175, 55, 0.045) 8px,
+    transparent 8px,
+    transparent 14px,
+    rgba(82, 34, 26, 0.03) 14px,
+    rgba(82, 34, 26, 0.03) 15px
+  );
+}
+
+/* ── Gold shimmer text animation ────────────────────────── */
+@keyframes goldShimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+.thai-gold-shimmer {
+  background: linear-gradient(
+    105deg,
+    #b8981e 0%,
+    #d4af37 20%,
+    #f5d98a 40%,
+    #edc046 55%,
+    #d4af37 75%,
+    #b8981e 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: goldShimmer 4s linear infinite;
+}
+
+/* ── Floating decoration animation ─────────────────────── */
+@keyframes thaiFloat {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+  66% {
+    transform: translateY(-5px) rotate(-1deg);
+  }
+}
+.thai-float {
+  animation: thaiFloat 7s ease-in-out infinite;
+}
+.thai-float-2 {
+  animation: thaiFloat 9s ease-in-out infinite 1.5s;
+}
+.thai-float-3 {
+  animation: thaiFloat 11s ease-in-out infinite 3s;
+}
+.thai-float-4 {
+  animation: thaiFloat 8s ease-in-out infinite 4.5s;
+}
+
+/* ── Thai Card hover effect (gold border glow) ──────────── */
+.thai-card-hover {
+  position: relative;
+  transition:
+    box-shadow 0.3s,
+    transform 0.3s;
+}
+.thai-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 12px 40px rgba(212, 175, 55, 0.18),
+    0 4px 12px rgba(82, 34, 26, 0.1);
+}
+.thai-card-hover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px solid transparent;
+  background: linear-gradient(135deg, #d4af37, #f5d98a 40%, #d4af37 80%)
+    border-box;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) padding-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.thai-card-hover:hover::after {
+  opacity: 1;
+}
+
+/* ── Section gold ornamental top stripe ─────────────────── */
+.thai-ornament-stripe {
+  position: relative;
+}
+.thai-ornament-stripe::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #b8981e 10%,
+    #d4af37 30%,
+    #f5d98a 50%,
+    #d4af37 70%,
+    #b8981e 90%,
+    transparent 100%
+  );
+}
+
+/* ── Fade entrance animation ────────────────────────────── */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fadeUp 0.6s ease-out forwards;
+}
+.animate-delay-100 {
+  animation-delay: 0.1s;
+  opacity: 0;
+}
+.animate-delay-200 {
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+.animate-delay-300 {
+  animation-delay: 0.3s;
+  opacity: 0;
+}
+
+/* ── Thai serif helper class ────────────────────────────── */
+.thai-serif {
+  font-family: var(--font-thai-serif), var(--font-sarabun), sans-serif;
+}

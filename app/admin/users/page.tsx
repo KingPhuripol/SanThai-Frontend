@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronLeft, ShieldCheck, ShieldOff, BadgeCheck } from "lucide-react";
 import { adminApi } from "@/lib/api";
 import { useAdminSession } from "@/lib/useAdminSession";
+import { useLanguage } from "@/components/LanguageProvider";
 
 const ROLE_LABEL: Record<string, string> = {
   artisan: "ช่างทอผ้า",
@@ -21,6 +22,8 @@ const ROLE_FILTERS = [
 ];
 
 export default function AdminUsersPage() {
+  const { locale } = useLanguage();
+  const roleLabel = (role: string) => locale === "en" ? ({ artisan: "Store", designer: "Designer", customer: "Customer", admin: "Administrator" }[role] || role) : (ROLE_LABEL[role] || role);
   const { session, checked } = useAdminSession();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,12 +49,12 @@ export default function AdminUsersPage() {
       await adminApi.verifyArtisan(artisanId);
       fetchUsers(roleFilter);
     } catch {
-      alert("ยืนยันตัวตนไม่สำเร็จ");
+      alert(locale === "en" ? "Could not verify this store." : "ยืนยันตัวตนไม่สำเร็จ");
     }
   };
 
   const handleToggleSuspend = async (userId: string, isSuspended: boolean) => {
-    const confirmMsg = isSuspended ? "ปลดระงับบัญชีนี้?" : "ระงับการใช้งานบัญชีนี้?";
+    const confirmMsg = isSuspended ? (locale === "en" ? "Restore this account?" : "ปลดระงับบัญชีนี้?") : (locale === "en" ? "Suspend this account?" : "ระงับการใช้งานบัญชีนี้?");
     if (!confirm(confirmMsg)) return;
     try {
       if (isSuspended) {
@@ -61,7 +64,7 @@ export default function AdminUsersPage() {
       }
       fetchUsers(roleFilter);
     } catch {
-      alert("ดำเนินการไม่สำเร็จ");
+      alert(locale === "en" ? "Action failed." : "ดำเนินการไม่สำเร็จ");
     }
   };
 
@@ -76,8 +79,8 @@ export default function AdminUsersPage() {
   return (
     <div className="min-h-screen bg-stone-50 pb-20">
       <div className="bg-white border-b border-brand-200 py-10 px-4 text-center">
-        <h1 className="text-3xl font-bold text-brand-950 thai-serif">จัดการผู้ใช้งาน</h1>
-        <p className="text-brand-950/60 text-xs mt-2">ยืนยันตัวตนช่างทอ และระงับบัญชีที่ทำผิดกฎ</p>
+        <h1 className="text-3xl font-bold text-brand-950 thai-serif">{locale === "en" ? "Manage users" : "จัดการผู้ใช้งาน"}</h1>
+        <p className="text-brand-950/60 text-xs mt-2">{locale === "en" ? "Verify stores and suspend accounts that violate platform rules." : "ยืนยันตัวตนช่างทอ และระงับบัญชีที่ทำผิดกฎ"}</p>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 mt-8">
@@ -86,7 +89,7 @@ export default function AdminUsersPage() {
           className="inline-flex items-center gap-1 text-xs font-bold tracking-widest uppercase text-brand-900 hover:text-brand-700 transition-colors mb-6"
         >
           <ChevronLeft size={13} />
-          กลับหน้า Dashboard
+          {locale === "en" ? "Back to dashboard" : "กลับหน้า Dashboard"}
         </Link>
 
         <div className="flex gap-2 mb-4">
@@ -100,7 +103,7 @@ export default function AdminUsersPage() {
                   : "bg-white border border-amber-200 text-brand-600 hover:bg-amber-50"
               }`}
             >
-              {f.label}
+              {locale === "en" ? (f.value === "" ? "All" : roleLabel(f.value)) : f.label}
             </button>
           ))}
         </div>
@@ -111,18 +114,18 @@ export default function AdminUsersPage() {
           </div>
         ) : users.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 text-center border border-amber-100/50 shadow-sm">
-            <p className="text-brand-600">ไม่มีผู้ใช้งานในหมวดนี้</p>
+            <p className="text-brand-600">{locale === "en" ? "No users in this category." : "ไม่มีผู้ใช้งานในหมวดนี้"}</p>
           </div>
         ) : (
           <div className="bg-white rounded-2xl shadow-sm border border-amber-100 overflow-hidden">
             <table className="w-full text-left text-sm">
               <thead className="bg-brand-50 text-brand-900">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">ชื่อ</th>
-                  <th className="px-4 py-3 font-semibold">อีเมล</th>
-                  <th className="px-4 py-3 font-semibold">บทบาท</th>
-                  <th className="px-4 py-3 font-semibold">สถานะ</th>
-                  <th className="px-4 py-3 font-semibold">การกระทำ</th>
+                  <th className="px-4 py-3 font-semibold">{locale === "en" ? "Name" : "ชื่อ"}</th>
+                  <th className="px-4 py-3 font-semibold">{locale === "en" ? "Email" : "อีเมล"}</th>
+                  <th className="px-4 py-3 font-semibold">{locale === "en" ? "Role" : "บทบาท"}</th>
+                  <th className="px-4 py-3 font-semibold">{locale === "en" ? "Status" : "สถานะ"}</th>
+                  <th className="px-4 py-3 font-semibold">{locale === "en" ? "Action" : "การกระทำ"}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-amber-50">
@@ -132,22 +135,22 @@ export default function AdminUsersPage() {
                     <td className="px-4 py-4 text-brand-600">{u.email}</td>
                     <td className="px-4 py-4">
                       <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-md text-xs font-semibold">
-                        {ROLE_LABEL[u.role] || u.role}
+                        {roleLabel(u.role)}
                       </span>
                       {u.role === "artisan" && u.verified_at && (
                         <span className="ml-1 inline-flex items-center gap-0.5 px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs font-semibold">
-                          <BadgeCheck size={11} /> ยืนยันแล้ว
+                          <BadgeCheck size={11} /> {locale === "en" ? "Verified" : "ยืนยันแล้ว"}
                         </span>
                       )}
                     </td>
                     <td className="px-4 py-4">
                       {u.is_suspended ? (
                         <span className="px-2 py-1 bg-red-100 text-red-700 rounded-md text-xs font-semibold">
-                          ถูกระงับ
+                          {locale === "en" ? "Suspended" : "ถูกระงับ"}
                         </span>
                       ) : (
                         <span className="px-2 py-1 bg-green-50 text-green-700 rounded-md text-xs font-semibold">
-                          ปกติ
+                          {locale === "en" ? "Active" : "ปกติ"}
                         </span>
                       )}
                     </td>
@@ -159,7 +162,7 @@ export default function AdminUsersPage() {
                             className="flex items-center gap-1 px-3 py-1.5 bg-brand-900 text-white rounded-lg text-xs font-bold hover:bg-brand-800 transition-colors"
                           >
                             <BadgeCheck size={12} />
-                            ยืนยันตัวตน
+                            {locale === "en" ? "Verify store" : "ยืนยันตัวตน"}
                           </button>
                         )}
                         {u.role !== "admin" && (
@@ -172,7 +175,7 @@ export default function AdminUsersPage() {
                             }`}
                           >
                             {u.is_suspended ? <ShieldCheck size={12} /> : <ShieldOff size={12} />}
-                            {u.is_suspended ? "ปลดระงับ" : "ระงับ"}
+                            {u.is_suspended ? (locale === "en" ? "Restore" : "ปลดระงับ") : (locale === "en" ? "Suspend" : "ระงับ")}
                           </button>
                         )}
                       </div>

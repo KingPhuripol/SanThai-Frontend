@@ -112,7 +112,7 @@ export default async function LibraryDetailPage({ params }: Props) {
 
   const imageUrl =
     fabric.image_url ||
-    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80";
+    "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric.jpg";
 
   const storyTags = fabric.story_tags;
 

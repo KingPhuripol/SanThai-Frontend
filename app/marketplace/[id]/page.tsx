@@ -25,8 +25,11 @@ import { productsApi } from "@/lib/api";
 import { getSession } from "@/lib/auth";
 import { ReservationCountdown } from "@/components/ReservationCountdown";
 import type { Product } from "@/lib/types";
+import { trackEvent } from "@/components/TrafficTracker";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function ProductDetailPage() {
+  const { locale, pick, t } = useLanguage();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
@@ -50,7 +53,7 @@ export default function ProductDetailPage() {
     productsApi
       .get(Number(id))
       .then(setProduct)
-      .catch(() => setError("ไม่พบสินค้า"))
+      .catch(() => setError(locale === "en" ? "Product not found" : "ไม่พบสินค้า"))
       .finally(() => setLoading(false));
 
     const s = getSession();
@@ -59,6 +62,10 @@ export default function ProductDetailPage() {
       setEmail(s.email || "");
     }
   }, [id]);
+
+  useEffect(() => {
+    if (product) trackEvent("product_view", { product_id: product.id });
+  }, [product]);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -76,16 +83,19 @@ export default function ProductDetailPage() {
           id: product.id,
           title_th: product.title_th,
           price_thb: product.price_thb,
+          shipping_cost_thb: product.shipping_cost_thb || 0,
+          free_shipping: Boolean(product.free_shipping),
           image_url: product.images?.[0] ?? product.fabric?.image_url ?? "",
           qty: qty,
         });
       }
       localStorage.setItem("santhai_cart", JSON.stringify(cartItems));
+      trackEvent("add_to_cart", { product_id: product.id, metadata: { quantity: qty } });
       
       // Dispatch event to update navbar cart count
       window.dispatchEvent(new Event("santhai-cart-changed"));
       
-      alert("เพิ่มสินค้าลงในตะกร้าเรียบร้อยแล้ว!");
+      alert(locale === "en" ? "Added to cart." : "เพิ่มสินค้าลงในตะกร้าเรียบร้อยแล้ว!");
     } catch (e) {
       console.error("Failed to add to cart:", e);
     }
@@ -97,11 +107,12 @@ export default function ProductDetailPage() {
       return;
     }
     if (!email || !buyerName) {
-      setError("กรุณากรอกชื่อและอีเมล");
+      setError(locale === "en" ? "Please enter your name and email." : "กรุณากรอกชื่อและอีเมล");
       return;
     }
     setOrdering(true);
     setError("");
+    trackEvent("checkout_started", { product_id: Number(id), metadata: { quantity: qty } });
     try {
       const res = await productsApi.createOrder({
         product_id: Number(id),
@@ -113,8 +124,9 @@ export default function ProductDetailPage() {
       setOrderId(res.id);
       setReservedUntil(res.reserved_until || null);
       setOrderDone(true);
+      trackEvent("checkout_created", { product_id: Number(id), metadata: { order_id: res.id, total_thb: res.total_thb } });
     } catch {
-      setError("ไม่สามารถสั่งซื้อได้ กรุณาลองใหม่");
+      setError(locale === "en" ? "Unable to place the order. Please try again." : "ไม่สามารถสั่งซื้อได้ กรุณาลองใหม่");
     } finally {
       setOrdering(false);
     }
@@ -132,9 +144,9 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen bg-brand-900 flex flex-col items-center justify-center text-white pt-20">
         <p className="text-5xl mb-4">🧵</p>
-        <p className="text-xl">ไม่พบสินค้าที่คุณค้นหา</p>
+        <p className="text-xl">{locale === "en" ? "The product you requested was not found." : "ไม่พบสินค้าที่คุณค้นหา"}</p>
         <Link href="/marketplace" className="mt-6 px-6 py-3 bg-gold-400 text-brand-900 rounded-full font-bold hover:bg-gold-300 transition-colors">
-          กลับไปตลาดผ้า
+          {locale === "en" ? "Back to marketplace" : "กลับไปตลาดผ้า"}
         </Link>
       </div>
     );
@@ -142,11 +154,11 @@ export default function ProductDetailPage() {
 
   // Mocking extra images for the gallery if backend doesn't provide enough
   const productImages = product.images?.length ? product.images : [
-    product.fabric?.image_url || "/uploads/thai_fabric_image_01.jpg",
-    "/uploads/thai_fabric_amnat_charoen_01.jpg",
-    "/uploads/thai_fabric_01.jpg",
-    "/uploads/thai_fabric_image_02.jpg",
-    "/uploads/thai_fabric_amnat_charoen_046.jpg",
+    product.fabric?.image_url || "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_01.jpg",
+    "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_amnat_charoen_01.jpg",
+    "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_01.jpg",
+    "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_02.jpg",
+    "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_amnat_charoen_046.jpg",
   ];
 
   const mainImage = productImages[activeImageIndex];
@@ -157,13 +169,13 @@ export default function ProductDetailPage() {
         
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-white/50 mb-6 font-medium">
-          <Link href="/" className="hover:text-gold-300 transition-colors flex items-center gap-1"><ChevronLeft size={14}/> หน้าหลัก</Link>
+          <Link href="/" className="hover:text-gold-300 transition-colors flex items-center gap-1"><ChevronLeft size={14}/> {t("home")}</Link>
           <span><ChevronRight size={14}/></span>
-          <Link href="/marketplace" className="hover:text-gold-300 transition-colors">ตลาดผ้า</Link>
+          <Link href="/marketplace" className="hover:text-gold-300 transition-colors">{t("marketplace")}</Link>
           <span><ChevronRight size={14}/></span>
           <Link href="/marketplace" className="hover:text-gold-300 transition-colors">ผ้าไหมมัดหมี่</Link>
           <span><ChevronRight size={14}/></span>
-          <span className="text-white/90">{product.title_th}</span>
+          <span className="text-white/90">{pick(product.title_th, product.title_en)}</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
@@ -285,7 +297,7 @@ export default function ProductDetailPage() {
                   
                   <div className="flex justify-between items-start mb-2">
                     <h1 className="text-[28px] md:text-[34px] font-bold text-brand-900 thai-serif leading-tight">
-                      {product.title_th}
+                      {pick(product.title_th, product.title_en)}
                     </h1>
                     <div className="flex gap-2">
                       <button className="w-10 h-10 rounded-full border border-brand-200 flex items-center justify-center text-brand-900/60 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-colors">
@@ -297,10 +309,10 @@ export default function ProductDetailPage() {
                     </div>
                   </div>
                   
-                  <p className="text-sm text-brand-900/60 mb-4">{product.title_en || "Mudmee Silk with Ancient Motif"}</p>
+                  <p className="text-sm text-brand-900/60 mb-4">{locale === "en" ? "Thai textile from a verified store" : (product.title_en || "Mudmee Silk with Ancient Motif")}</p>
                   
                   <div className="flex items-center gap-4 text-sm text-brand-900/60 mb-6">
-                    <span>รหัสสินค้า ST-MM-{(product.id).toString().padStart(5, '0')}</span>
+                    <span>{locale === "en" ? "Product code" : "รหัสสินค้า"} {product.product_code || `ST-PRD-${(product.id).toString().padStart(6, '0')}`}</span>
                     <div className="flex items-center gap-1">
                       <span className="font-bold text-brand-900">4.9</span>
                       <div className="flex text-gold-400">
@@ -316,14 +328,14 @@ export default function ProductDetailPage() {
 
                   <div className="flex items-end gap-3 border-b border-brand-200/50 pb-6 mb-6">
                     <span className="text-[40px] font-extrabold text-brand-900 thai-serif leading-none tracking-tight">฿{product.price_thb.toLocaleString()}</span>
-                    <span className="text-brand-900/50 mb-2">/ ผืน</span>
+                    <span className="text-brand-900/50 mb-2">/ {product.sale_unit === "meter" ? (locale === "en" ? "metre" : "เมตร") : product.sale_unit === "roll" ? (locale === "en" ? "roll" : "ม้วน") : product.sale_unit === "set" ? (locale === "en" ? "set" : "ชุด") : (locale === "en" ? "piece" : "ผืน")}</span>
                     <span className={`ml-auto px-4 py-1.5 rounded-full text-xs font-bold ${product.stock > 0 ? "bg-[#E6F4EA] text-[#137333]" : "bg-red-50 text-red-600"}`}>
-                      {product.stock > 0 ? "มีสินค้า" : "สินค้าหมด"}
+                      {product.stock > 0 ? (locale === "en" ? "In stock" : "มีสินค้า") : (locale === "en" ? "Sold out" : "สินค้าหมด")}
                     </span>
                   </div>
 
                   <p className="text-[15px] text-brand-900/80 leading-[1.8] mb-6">
-                    {product.description_th || "ผ้าไหมมัดหมี่ทอมือ ลวดลายโบราณอันเป็นสัญลักษณ์แห่งความเจริญ ทอด้วยเส้นไหมแท้ 100% ย้อมสีธรรมชาติ ให้สัมผัสนุ่ม ละมุน สวมใส่ง่าย เหมาะสำหรับตัดชุดไทย ชุดออกงาน หรือสะสม"}
+                    {pick(product.description_th, product.description_en, locale === "en" ? "A Thai textile from a verified SanThai store." : "ผ้าไทยจากร้านค้าที่ผ่านการยืนยันโดย SanThai")}
                   </p>
 
                   {/* Badges */}
@@ -335,27 +347,21 @@ export default function ProductDetailPage() {
                     ))}
                   </div>
 
-                  {/* Digital ID link */}
-                  {product.fabric_id && (
-                    <Link href={`/fabric/${product.fabric_id}`} className="mb-8 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-brand-200 bg-white text-sm text-brand-900 font-medium hover:border-brand-900 transition-colors shadow-sm w-fit">
-                      <QrCode size={16} className="text-brand-900/50" /> ดู Digital ID · ตรวจสอบ Provenance
+                  {/* SanThai Passport */}
+                  {product.passport?.code && (
+                    <Link href={`/passport/${product.passport.code}`} className="mb-8 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-brand-200 bg-white text-sm text-brand-900 font-medium hover:border-brand-900 transition-colors shadow-sm w-fit">
+                      <QrCode size={16} className="text-brand-900/50" /> {locale === "en" ? "View SanThai Passport" : "ดู SanThai Passport · ตรวจสอบข้อมูลสินค้า"}
                     </Link>
                   )}
 
                   {/* Form */}
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                      <p className="text-xs font-bold text-brand-900 mb-2">ขนาด / ความยาว</p>
-                      <div className="relative">
-                        <select className="w-full appearance-none bg-white border border-brand-200 rounded-xl px-4 py-3 text-sm text-brand-900 focus:outline-none focus:border-brand-900 focus:ring-1 focus:ring-brand-900">
-                          <option>1 ผืน (2 เมตร)</option>
-                          <option>2 ผืน (4 เมตร)</option>
-                        </select>
-                        <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-900/50 pointer-events-none" />
-                      </div>
+                      <p className="text-xs font-bold text-brand-900 mb-2">{locale === "en" ? "Dimensions" : "ขนาด / ความยาว"}</p>
+                      <div className="rounded-xl border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900">{product.width_cm ? (locale === "en" ? `Width ${product.width_cm} cm` : `กว้าง ${product.width_cm} ซม.`) : (locale === "en" ? "Store-specified dimensions" : "ขนาดตามที่ร้านระบุ")}{product.length_cm ? (locale === "en" ? ` · Length ${product.length_cm} cm` : ` · ยาว ${product.length_cm} ซม.`) : ""}</div>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-brand-900 mb-2">จำนวน</p>
+                      <p className="text-xs font-bold text-brand-900 mb-2">{locale === "en" ? "Quantity" : "จำนวน"}</p>
                       <div className="flex items-center border border-brand-200 bg-white rounded-xl h-[46px] overflow-hidden">
                         <button onClick={() => setQty(Math.max(1, qty - 1))} className="flex-1 text-brand-900/50 hover:bg-brand-50 hover:text-brand-900 transition-colors h-full flex items-center justify-center font-bold">
                           −
@@ -386,7 +392,7 @@ export default function ProductDetailPage() {
                       className="flex items-center justify-center gap-2 border-2 border-brand-900 text-brand-900 font-bold py-3.5 rounded-2xl hover:bg-brand-900 hover:text-white transition-all disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-brand-900 shadow-sm"
                     >
                       <ShoppingBag size={18} strokeWidth={2.5} />
-                      เพิ่มลงตะกร้า
+                      {locale === "en" ? "Add to cart" : "เพิ่มลงตะกร้า"}
                     </button>
                     <button 
                       onClick={handleOrder}
@@ -394,12 +400,12 @@ export default function ProductDetailPage() {
                       className="flex items-center justify-center gap-2 bg-gradient-to-r from-gold-400 to-gold-500 text-brand-950 font-bold py-3.5 rounded-2xl hover:opacity-90 transition-all shadow-[0_4px_15px_rgba(212,175,55,0.3)] disabled:opacity-50"
                     >
                       <span className="text-xl leading-none">⚡</span>
-                      {ordering ? "กำลังดำเนินการ..." : "ซื้อเลย"}
+                      {ordering ? (locale === "en" ? "Processing…" : "กำลังดำเนินการ...") : (locale === "en" ? "Buy now" : "ซื้อเลย")}
                     </button>
                   </div>
                   
                   <div className="mt-4 flex items-center justify-center gap-2 text-xs text-brand-900/50">
-                    <ShieldCheck size={14} className="text-green-600" /> รับประกันความพึงพอใจ 100% คืนสินค้าได้ภายใน 7 วัน
+                    <ShieldCheck size={14} className="text-green-600" /> {locale === "en" ? "Verified store · order updates include timestamps" : "ร้านค้ายืนยันแล้ว · สถานะคำสั่งซื้อจะแจ้งพร้อมเวลาในระบบ"}
                   </div>
 
                 </div>
@@ -415,7 +421,7 @@ export default function ProductDetailPage() {
               <div className="absolute top-0 left-0 w-full h-24 bg-brand-900" />
               <div className="relative flex justify-center mb-4 mt-8">
                 <div className="w-24 h-24 rounded-full border-4 border-[#FAF6ED] overflow-hidden bg-brand-200 relative shadow-lg">
-                  <Image src="/uploads/thai_fabric_image_01.jpg" alt="Artisan" fill sizes="96px" className="object-cover" />
+                  <Image src="https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_01.jpg" alt="Artisan" fill sizes="96px" className="object-cover" />
                   <div className="absolute bottom-0 right-0 w-6 h-6 bg-blue-500 rounded-full border-2 border-[#FAF6ED] flex items-center justify-center text-white">
                     <CheckCircle2 size={12} strokeWidth={3} />
                   </div>
@@ -424,7 +430,7 @@ export default function ProductDetailPage() {
               
               <div className="text-center mb-6">
                 <h3 className="text-lg font-bold text-brand-900 flex items-center justify-center gap-1.5">
-                  เรือนไหม by แม่คำปั้น <CheckCircle2 size={16} className="text-blue-500" fill="currentColor" />
+                  {product.artisan?.name || "ร้านค้า SanThai"} {product.artisan?.verified && <CheckCircle2 size={16} className="text-blue-500" fill="currentColor" />}
                 </h3>
                 <p className="text-sm text-brand-900/50 flex items-center justify-center gap-1 mt-1">
                   <MapPin size={12} className="text-gold-500" /> {product.community?.province || "จ.อุบลราชธานี"}
@@ -446,14 +452,14 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
-              <Link href="#" className="flex items-center justify-center w-full py-3 bg-white border border-brand-200 rounded-xl text-sm font-bold text-brand-900 hover:border-brand-900 transition-colors mb-6 shadow-sm">
+              <Link href={product.artisan?.id ? `/storefront/${product.artisan.id}` : "/community"} className="flex items-center justify-center w-full py-3 bg-white border border-brand-200 rounded-xl text-sm font-bold text-brand-900 hover:border-brand-900 transition-colors mb-6 shadow-sm">
                 ดูหน้าร้านค้า
               </Link>
 
               <div className="space-y-3">
                 {[
-                  { icon: <CheckCircle2 size={16} className="text-green-500" />, t: "ผู้ขายได้รับการยืนยัน" },
-                  { icon: <Award size={16} className="text-gold-500" />, t: "สินค้าทุกชิ้นทอมือจริง" },
+                  { icon: <CheckCircle2 size={16} className="text-green-500" />, t: product.artisan?.verified ? "ร้านค้าได้รับการยืนยัน" : "อยู่ระหว่างตรวจสอบร้านค้า" },
+                  { icon: <Award size={16} className="text-gold-500" />, t: product.passport?.status === "verified" ? "Passport ตรวจสอบโดย SanThai" : "มี SanThai Passport" },
                   { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-500"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>, t: "Story จากผู้สร้างสรรค์จริง" },
                   { icon: <Package size={16} className="text-brand-500" />, t: "จัดส่งปลอดภัย" }
                 ].map((item, i) => (
@@ -472,8 +478,8 @@ export default function ProductDetailPage() {
               </div>
               <div className="space-y-4">
                 {[
-                  { name: "ผ้าไหมมัดหมี่ลายโบราณ", price: "2,750", img: "/uploads/thai_fabric_amnat_charoen_01.jpg" },
-                  { name: "ผ้าไหมแพรวา", price: "3,250", img: "/uploads/thai_fabric_01.jpg" }
+                  { name: "ผ้าไหมมัดหมี่ลายโบราณ", price: "2,750", img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_amnat_charoen_01.jpg" },
+                  { name: "ผ้าไหมแพรวา", price: "3,250", img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_01.jpg" }
                 ].map((item, i) => (
                   <div key={i} className="flex gap-3 group cursor-pointer">
                     <div className="w-20 h-20 rounded-xl overflow-hidden bg-white shrink-0 relative">
@@ -497,11 +503,10 @@ export default function ProductDetailPage() {
             {/* Tab Headers */}
             <div className="flex overflow-x-auto bg-brand-900 text-white scrollbar-hide">
               {[
-                { id: "story", label: "เรื่องราวของผืนผ้า" },
-                { id: "details", label: "รายละเอียดสินค้า" },
-                { id: "care", label: "การดูแลรักษา" },
-                { id: "reviews", label: "รีวิวจากลูกค้า (128)" },
-                { id: "shipping", label: "จัดส่งและคืนสินค้า" }
+                { id: "story", label: locale === "en" ? "Fabric story" : "เรื่องราวของผืนผ้า" },
+                { id: "details", label: locale === "en" ? "Product details" : "รายละเอียดสินค้า" },
+                { id: "care", label: locale === "en" ? "Care instructions" : "การดูแลรักษา" },
+                { id: "reviews", label: locale === "en" ? "Customer reviews (128)" : "รีวิวจากลูกค้า (128)" }
               ].map(tab => (
                 <button 
                   key={tab.id}
@@ -545,14 +550,14 @@ export default function ProductDetailPage() {
                   <div>
                     <h3 className="text-lg font-bold text-brand-900 mb-6 flex items-center justify-between">
                       กระบวนการทอผ้า
-                      <Link href="#" className="text-xs font-medium text-brand-900/50 bg-white border border-brand-200 px-4 py-2 rounded-full hover:border-brand-900 transition-colors">ดูเบื้องหลังทั้งหมด</Link>
+                      <Link href={product.passport?.code ? `/passport/${product.passport.code}` : `/fabric/${product.fabric_id}`} className="text-xs font-medium text-brand-900/50 bg-white border border-brand-200 px-4 py-2 rounded-full hover:border-brand-900 transition-colors">ดูเบื้องหลังทั้งหมด</Link>
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
                       {[
-                        { img: "/uploads/thai_fabric_image_01.jpg", t: "1. คัดสรรเส้นไหม" },
-                        { img: "/uploads/thai_fabric_amnat_charoen.jpg", t: "2. ย้อมสีธรรมชาติ" },
-                        { img: "/uploads/thai_fabric_image_02.jpg", t: "3. มัดหมี่ด้วยมือ" },
-                        { img: "/uploads/thai_fabric_amnat_charoen_01.jpg", t: "4. ทอด้วยความประณีต" },
+                        { img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_01.jpg", t: "1. คัดสรรเส้นไหม" },
+                        { img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_amnat_charoen.jpg", t: "2. ย้อมสีธรรมชาติ" },
+                        { img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_02.jpg", t: "3. มัดหมี่ด้วยมือ" },
+                        { img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_amnat_charoen_01.jpg", t: "4. ทอด้วยความประณีต" },
                       ].map((step, i) => (
                         <div key={i} className="group cursor-pointer">
                           <div className="relative aspect-video rounded-xl overflow-hidden bg-brand-100 mb-2">
@@ -567,10 +572,23 @@ export default function ProductDetailPage() {
                 </div>
               )}
               
-              {activeTab !== "story" && (
+              {activeTab === "details" && (
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {[
+                    [locale === "en" ? "Product code" : "รหัสสินค้า", product.product_code], [locale === "en" ? "Availability" : "สถานะสินค้า", product.product_type === "made_to_order" ? (locale === "en" ? "Made to order" : "สั่งทำ") : product.product_type === "pre_order" ? (locale === "en" ? "Pre-order" : "พรีออเดอร์") : (locale === "en" ? "Ready to ship" : "พร้อมจัดส่ง")],
+                    [locale === "en" ? "Preparation time" : "ระยะเวลาจัดเตรียม", product.preparation_time], [locale === "en" ? "Sales unit" : "หน่วยขาย", product.sale_unit === "meter" ? (locale === "en" ? "Metre" : "เมตร") : product.sale_unit === "roll" ? (locale === "en" ? "Roll" : "ม้วน") : product.sale_unit === "set" ? (locale === "en" ? "Set" : "ชุด") : (locale === "en" ? "Piece" : "ผืน/ชิ้น")],
+                    [locale === "en" ? "Dimensions" : "ขนาด", product.width_cm || product.length_cm ? `${product.width_cm || "-"} × ${product.length_cm || "-"} cm` : undefined], [locale === "en" ? "Weight" : "น้ำหนัก", product.weight_g ? `${product.weight_g} ${locale === "en" ? "g" : "กรัม"}` : undefined],
+                    [locale === "en" ? "Colour" : "สี", product.primary_color], [locale === "en" ? "Pattern" : "ลวดลาย", product.pattern_name], [locale === "en" ? "Dye method" : "วิธีการย้อม", product.dye_method], [locale === "en" ? "Texture" : "ผิวสัมผัส", product.texture], [locale === "en" ? "Production method" : "วิธีผลิต", product.production_method], [locale === "en" ? "Production origin" : "แหล่งผลิต", product.production_origin],
+                  ].filter(([, value]) => value).map(([label, value]) => <div key={String(label)} className="rounded-xl border border-brand-200 bg-white p-4"><p className="text-xs font-bold text-brand-900/50">{label}</p><p className="mt-1 font-bold">{value}</p></div>)}
+                </div>
+              )}
+              {activeTab === "care" && (
+                <div className="max-w-2xl rounded-2xl border border-amber-100 bg-white p-6"><h3 className="text-xl font-bold thai-serif">{locale === "en" ? "Care instructions" : "การดูแลรักษา"}</h3><p className="mt-4 text-sm leading-7 text-brand-900/70">{product.care_instructions || (locale === "en" ? "The store has not added care instructions for this product yet." : "ร้านค้ายังไม่ได้ระบุคำแนะนำการดูแลรักษาสำหรับสินค้านี้")}</p></div>
+              )}
+              {activeTab === "reviews" && (
                 <div className="flex flex-col items-center justify-center py-12 text-brand-900/40">
                   <Package size={48} className="mb-4 opacity-50" />
-                  <p>กำลังเตรียมข้อมูลสำหรับหัวข้อนี้...</p>
+                  <p>{locale === "en" ? "This section is being prepared." : "กำลังเตรียมข้อมูลสำหรับหัวข้อนี้..."}</p>
                 </div>
               )}
             </div>

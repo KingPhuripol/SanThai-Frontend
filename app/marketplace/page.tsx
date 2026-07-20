@@ -5,6 +5,7 @@ import { Search, Filter, X } from "lucide-react";
 import { productsApi, searchApi } from "@/lib/api";
 import FabricCard from "@/components/FabricCard";
 import type { Product, SearchResult } from "@/lib/types";
+import { useLanguage } from "@/components/LanguageProvider";
 
 const REGIONS = ["ภาคเหนือ", "ภาคอีสาน", "ภาคกลาง", "ภาคใต้"];
 const TECHNIQUES = ["มัดหมี", "ขิด", "จก", "ยกดอก", "ทอมือ"];
@@ -16,6 +17,7 @@ const PRICE_RANGES = [
 ];
 
 export default function MarketplacePage() {
+  const { locale, pick } = useLanguage();
   const [products, setProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[] | null>(
@@ -153,10 +155,9 @@ export default function MarketplacePage() {
               }}
             />
           </div>
-          <h1 className="text-3xl font-bold mb-2 thai-serif">ตลาดผ้าไทย</h1>
+          <h1 className="text-3xl font-bold mb-2 thai-serif">{locale === "en" ? "Thai Fabric Marketplace" : "ตลาดผ้าไทย"}</h1>
           <p className="text-amber-200/80 text-sm max-w-lg mx-auto">
-            ลายผ้าจากช่างทอทั่วไทย ทุกชิ้นมี Digital ID และ Provenance
-            ยืนยันความแท้
+            {locale === "en" ? "Thai textiles from verified stores, with SanThai Passports and transparent production information." : "ผ้าไทยจากร้านค้ายืนยันแล้ว พร้อม SanThai Passport และข้อมูลแหล่งผลิต"}
           </p>
 
           {/* Search bar */}
@@ -170,7 +171,7 @@ export default function MarketplacePage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="ค้นหาด้วย AI เช่น 'ลายสำหรับงานแต่ง' หรือ 'ผ้าความหมายเรื่องความรัก'"
+                placeholder={locale === "en" ? "Search with AI, e.g. ‘a pattern for a wedding’" : "ค้นหาด้วย AI เช่น 'ลายสำหรับงานแต่ง' หรือ 'ผ้าความหมายเรื่องความรัก'"}
                 className="w-full pl-11 pr-20 py-3.5 rounded-full bg-white text-brand-900 text-sm focus:outline-none focus:ring-2 focus:ring-gold-400 placeholder-brand-300"
               />
               {searchQuery && (
@@ -187,7 +188,7 @@ export default function MarketplacePage() {
                 disabled={searching}
                 className="absolute right-2 top-1/2 -translate-y-1/2 bg-gold-500 hover:bg-gold-400 text-brand-950 text-sm font-bold px-4 py-1.5 rounded-full transition-colors disabled:opacity-60"
               >
-                {searching ? "…" : "ค้นหา"}
+                {searching ? "…" : (locale === "en" ? "Search" : "ค้นหา")}
               </button>
             </div>
           </form>
@@ -202,7 +203,7 @@ export default function MarketplacePage() {
             className="shrink-0 flex items-center gap-1.5 text-sm px-3 py-1.5 border border-amber-200 rounded-full text-brand-700 hover:bg-amber-50"
           >
             <Filter size={14} />
-            ตัวกรอง
+            {locale === "en" ? "Filters" : "ตัวกรอง"}
           </button>
 
           {TECHNIQUES.map((t) => (
@@ -226,7 +227,7 @@ export default function MarketplacePage() {
         {showFilters && (
           <div className="mb-6 p-4 bg-white rounded-2xl border border-amber-100 shadow-sm">
             <p className="text-sm font-semibold text-brand-700 mb-3">
-              ช่วงราคา
+              {locale === "en" ? "Price range" : "ช่วงราคา"}
             </p>
             <div className="flex flex-wrap gap-2">
               {PRICE_RANGES.map((pr) => (
@@ -250,10 +251,10 @@ export default function MarketplacePage() {
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-brand-500">
             {searchResults !== null
-              ? `พบ ${searchResults.length} ผลลัพธ์ สำหรับ "${searchQuery}"`
+              ? (locale === "en" ? `${searchResults.length} results for “${searchQuery}”` : `พบ ${searchResults.length} ผลลัพธ์ สำหรับ "${searchQuery}"`)
               : loading
-                ? "กำลังโหลด…"
-                : `${products.length} รายการ`}
+                ? (locale === "en" ? "Loading…" : "กำลังโหลด…")
+                : (locale === "en" ? `${products.length} items` : `${products.length} รายการ`)}
           </p>
         </div>
 
@@ -284,29 +285,29 @@ export default function MarketplacePage() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={r.image_url}
-                      alt={r.name_th}
+                      alt={pick(r.name_th, r.name_en)}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   )}
                   <div className="absolute bottom-2 right-2 bg-gold-500/90 text-brand-950 text-xs font-bold px-2 py-0.5 rounded-full">
-                    {r.relevance_score.toFixed(0)}% ตรงกัน
+                    {r.relevance_score.toFixed(0)}% {locale === "en" ? "match" : "ตรงกัน"}
                   </div>
                 </div>
                 <div className="p-3">
                   <h3 className="font-semibold text-brand-900 text-sm">
-                    {r.name_th}
+                    {pick(r.name_th, r.name_en)}
                   </h3>
                   <p className="text-xs text-brand-500 mt-0.5">
                     {r.province} · {r.artisan_name}
                   </p>
-                  {r.cultural_meaning_th && (
+                  {(r.cultural_meaning_th) && (
                     <p className="text-xs text-brand-600 mt-1.5 line-clamp-2 leading-relaxed">
-                      {r.cultural_meaning_th}
+                      {locale === "en" ? r.cultural_meaning_en || r.cultural_meaning_th : r.cultural_meaning_th}
                     </p>
                   )}
                   {r.price_thb && (
                     <p className="mt-2 font-bold text-brand-900">
-                      ฿{r.price_thb.toLocaleString()}
+                      {locale === "en" && r.price_usd ? `$${r.price_usd.toFixed(0)} USD` : `฿${r.price_thb.toLocaleString()}`}
                     </p>
                   )}
                 </div>
@@ -324,7 +325,7 @@ export default function MarketplacePage() {
         {!loading && products.length === 0 && searchResults === null && (
           <div className="text-center py-20 text-brand-400">
             <p className="text-4xl mb-3">🧵</p>
-            <p>ยังไม่มีสินค้า — ลองรัน seed script ก่อน</p>
+            <p>{locale === "en" ? "No products are available yet." : "ยังไม่มีสินค้า — ลองรัน seed script ก่อน"}</p>
           </div>
         )}
       </div>

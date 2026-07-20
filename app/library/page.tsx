@@ -92,7 +92,7 @@ const REGION_ACCENTS: Record<string, string> = {
 function PatternCard({ fabric }: { fabric: FabricPattern }) {
   const imageUrl =
     (fabric.image_url as string) ||
-    "/uploads/thai_fabric_image_01.jpg";
+    "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_01.jpg";
 
   const region = fabric.community?.region ?? "";
   const accent = REGION_ACCENTS[region] ?? "#52221a";

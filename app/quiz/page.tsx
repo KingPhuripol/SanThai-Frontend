@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { artisanApi } from "@/lib/api";
 import type { Recommendation } from "@/lib/types";
+import { useLanguage } from "@/components/LanguageProvider";
 
 const COLOR_SWATCHES: Record<string, string[]> = {
   red_purple:  ["#8b1a1a", "#6b21a8"],
@@ -17,11 +18,11 @@ const COLOR_SWATCHES: Record<string, string[]> = {
 
 // ── image rotates per step ────────────────────────────────────────────────────
 const STEP_IMAGES = [
-  "/uploads/thai_fabric_amnat_charoen_01.jpg",
-  "/uploads/thai_fabric_01.jpg",
-  "/uploads/thai_fabric_amnat_charoen_046.jpg",
-  "/uploads/thai_fabric_image_01.jpg",
-  "/uploads/thai_fabric_image_02.jpg",
+  "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_amnat_charoen_01.jpg",
+  "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_01.jpg",
+  "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_amnat_charoen_046.jpg",
+  "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_01.jpg",
+  "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_02.jpg",
 ];
 
 const STEPS = [
@@ -83,13 +84,23 @@ const STEPS = [
   },
 ];
 
+const QUIZ_EN: Record<string, { question: string; sub: string; options: Record<string, string> }> = {
+  gender: { question: "Who are you?", sub: "This helps us suggest suitable patterns and fabric styles.", options: { female: "Women", male: "Men", unisex: "Any gender / prefer not to say" } },
+  occasion: { question: "What occasion is the textile for?", sub: "Choose the occasion that best matches your needs.", options: { wedding: "Wedding / auspicious ceremony", ceremony: "Memorial / important ceremony", formal: "Work / meeting", casual: "Everyday wear", gift: "Gift / souvenir" } },
+  personality: { question: "Which style do you prefer?", sub: "Your style helps us choose patterns more precisely.", options: { classic: "Classic / traditional", modern: "Modern / contemporary", minimal: "Minimal / simple", bold: "Colourful / bold" } },
+  color: { question: "Which colour palette do you prefer?", sub: "Colour informs the pattern and dye recommendation.", options: { red_purple: "Red / purple", gold_yellow: "Gold / yellow", blue_indigo: "Blue / indigo", green_earth: "Green / earth", neutral: "White / cream / beige" } },
+  budget: { question: "What is your budget?", sub: "There is no wrong answer.", options: { "3000": "Up to ฿3,000", "6000": "฿3,000 – ฿6,000", "10000": "฿6,000 – ฿10,000", "0": "No limit" } },
+};
+
 export default function QuizPage() {
+  const { locale, pick } = useLanguage();
   const [step, setStep]       = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [results, setResults] = useState<Recommendation[] | null>(null);
   const [loading, setLoading] = useState(false);
 
   const currentStep = STEPS[step];
+  const englishStep = QUIZ_EN[currentStep.id];
   const isLastStep  = step === STEPS.length - 1;
 
   const selectOption = (value: string) => {
@@ -141,9 +152,9 @@ export default function QuizPage() {
           </div>
           <div className="text-center">
             <p className="text-sm font-semibold tracking-[0.18em] uppercase text-gold-400">
-              AI กำลังวิเคราะห์
+              {locale === "en" ? "AI is analysing" : "AI กำลังวิเคราะห์"}
             </p>
-            <p className="mt-1.5 text-xs text-white/50">ใช้เวลาไม่เกิน 10 วินาที</p>
+            <p className="mt-1.5 text-xs text-white/50">{locale === "en" ? "Usually takes under 10 seconds" : "ใช้เวลาไม่เกิน 10 วินาที"}</p>
           </div>
         </div>
       </div>
@@ -161,17 +172,17 @@ export default function QuizPage() {
                 Style Result
               </p>
               <h1 className="text-3xl md:text-4xl font-bold text-white thai-serif">
-                ผ้าที่เหมาะกับคุณ
+                {locale === "en" ? "Textiles for you" : "ผ้าที่เหมาะกับคุณ"}
               </h1>
               <p className="mt-2 text-sm text-brand-200">
-                AI ได้เลือกลายผ้าที่ตรงกับบุคลิกและโอกาสของคุณ
+                {locale === "en" ? "AI selected textiles that suit your style and occasion." : "AI ได้เลือกลายผ้าที่ตรงกับบุคลิกและโอกาสของคุณ"}
               </p>
             </div>
             <button
               onClick={() => { setStep(0); setAnswers({}); setResults(null); }}
               className="text-sm text-brand-300 hover:text-white transition-colors flex items-center gap-1.5"
             >
-              <ArrowLeft size={13} /> ทำ Quiz ใหม่
+              <ArrowLeft size={13} /> {locale === "en" ? "Start again" : "ทำ Quiz ใหม่"}
             </button>
           </div>
         </div>
@@ -179,7 +190,7 @@ export default function QuizPage() {
         <div className="max-w-5xl mx-auto px-8 md:px-16 pt-10">
           {results.length === 0 ? (
             <div className="py-20 text-center">
-              <p className="text-stone-400 text-sm">ยังไม่มีผ้าที่ตรงกัน — ลองรัน seed ก่อน</p>
+              <p className="text-stone-400 text-sm">{locale === "en" ? "No matching textiles yet." : "ยังไม่มีผ้าที่ตรงกัน — ลองรัน seed ก่อน"}</p>
             </div>
           ) : (
             <div className="divide-y divide-stone-100">
@@ -191,14 +202,14 @@ export default function QuizPage() {
                   <div className="grid md:grid-cols-[140px_1fr] gap-6 items-start">
                     {rec.image_url && (
                       <div className="relative w-full aspect-[3/4] bg-stone-100 overflow-hidden">
-                        <Image src={rec.image_url} alt={rec.name_th} fill className="object-cover" />
+                        <Image src={rec.image_url} alt={pick(rec.name_th, rec.name_en)} fill className="object-cover" />
                       </div>
                     )}
                     <div>
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <h3 className="text-xl font-bold text-stone-900 thai-serif leading-snug">
-                            {rec.name_th}
+                            {pick(rec.name_th, rec.name_en)}
                           </h3>
                           <p className="text-xs text-stone-400 mt-0.5 tracking-wider uppercase">
                             {rec.name_en}
@@ -209,7 +220,7 @@ export default function QuizPage() {
                             {Math.round(rec.match_score * 100)}
                             <span className="text-sm font-normal text-stone-400">%</span>
                           </p>
-                          <p className="text-[10px] text-stone-400 uppercase tracking-widest mt-0.5">ตรงกัน</p>
+                          <p className="text-[10px] text-stone-400 uppercase tracking-widest mt-0.5">{locale === "en" ? "match" : "ตรงกัน"}</p>
                         </div>
                       </div>
                       <div className="mt-3 mb-4 h-px w-full bg-stone-100 relative">
@@ -221,7 +232,7 @@ export default function QuizPage() {
                       <p className="text-sm text-stone-600 leading-[1.85]">{rec.reason}</p>
                       {rec.price_thb && (
                         <p className="mt-3 text-sm font-bold text-stone-900">
-                          ฿{rec.price_thb.toLocaleString()}
+                          {locale === "en" ? `$${(rec.price_thb / 35).toLocaleString(undefined, { maximumFractionDigits: 0 })} USD` : `฿${rec.price_thb.toLocaleString()}`}
                         </p>
                       )}
                       <div className="mt-4 flex gap-3">
@@ -230,14 +241,14 @@ export default function QuizPage() {
                             href={`/marketplace/${rec.product_id}`}
                             className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-stone-900 text-white text-xs font-medium hover:bg-stone-700 transition-colors"
                           >
-                            ดูสินค้า <ArrowRight size={12} />
+                            {locale === "en" ? "View product" : "ดูสินค้า"} <ArrowRight size={12} />
                           </Link>
                         )}
                         <Link
                           href={`/library/${rec.fabric_id}`}
                           className="inline-flex items-center gap-1.5 px-5 py-2.5 border border-stone-300 text-stone-600 text-xs font-medium hover:border-stone-500 transition-colors"
                         >
-                          Digital ID
+                          SanThai Passport
                         </Link>
                       </div>
                     </div>
@@ -251,7 +262,7 @@ export default function QuizPage() {
               href="/library"
               className="text-sm text-stone-500 hover:text-stone-900 transition-colors underline underline-offset-4"
             >
-              ดูห้องสมุดลายทั้งหมด →
+              {locale === "en" ? "View all fabric patterns →" : "ดูห้องสมุดลายทั้งหมด →"}
             </Link>
           </div>
         </div>
@@ -268,7 +279,7 @@ export default function QuizPage() {
         <Image
           key={step}
           src={STEP_IMAGES[step % STEP_IMAGES.length]}
-          alt="ลายผ้าไทย"
+          alt={locale === "en" ? "Thai textile pattern" : "ลายผ้าไทย"}
           fill
           className="object-cover opacity-80 transition-opacity duration-700"
           priority
@@ -292,7 +303,7 @@ export default function QuizPage() {
             Style Quiz · {step + 1} of {STEPS.length}
           </p>
           <p className="text-white text-lg font-semibold thai-serif mt-1">
-            สานไทย — ผ้าทอมือไทย
+            {locale === "en" ? "SanThai — Thai handwoven textiles" : "สานไทย — ผ้าทอมือไทย"}
           </p>
         </div>
       </div>
@@ -319,9 +330,9 @@ export default function QuizPage() {
             Style Quiz · {currentStep.step}
           </p>
           <h2 className="text-3xl md:text-4xl font-bold text-white thai-serif leading-tight mb-3">
-            {currentStep.question}
+            {locale === "en" ? englishStep.question : currentStep.question}
           </h2>
-          <p className="text-sm text-brand-200 leading-relaxed">{currentStep.sub}</p>
+          <p className="text-sm text-brand-200 leading-relaxed">{locale === "en" ? englishStep.sub : currentStep.sub}</p>
         </div>
 
         {/* Options */}
@@ -354,7 +365,7 @@ export default function QuizPage() {
                       isSelected ? "text-gold-400" : "text-white"
                     }`}
                   >
-                    {opt.label}
+                    {locale === "en" ? englishStep.options[opt.value] || opt.label : opt.label}
                   </span>
                 </div>
                 <ArrowRight
@@ -376,7 +387,7 @@ export default function QuizPage() {
             onClick={() => setStep(step - 1)}
             className="mt-8 flex items-center gap-1.5 text-sm text-brand-300 hover:text-white transition-colors self-start"
           >
-            <ArrowLeft size={13} /> ย้อนกลับ
+            <ArrowLeft size={13} /> {locale === "en" ? "Back" : "ย้อนกลับ"}
           </button>
         )}
       </div>

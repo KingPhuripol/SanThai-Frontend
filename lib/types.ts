@@ -1,6 +1,8 @@
 export interface Community {
   name: string;
+  name_en?: string;
   province: string;
+  province_en?: string;
   region: string;
   latitude?: number;
   longitude?: number;
@@ -9,6 +11,7 @@ export interface Community {
 export interface Artisan {
   id: number;
   name: string;
+  verified?: boolean;
   bio_th?: string;
   bio_en?: string;
   avatar_url?: string;
@@ -61,6 +64,7 @@ export interface ProvenanceResponse {
 
 export interface Product {
   id: number;
+  product_code?: string;
   title_th: string;
   title_en?: string;
   description_th?: string;
@@ -69,6 +73,32 @@ export interface Product {
   price_usd: number;
   stock: number;
   category?: string;
+  is_active?: boolean;
+  product_type?: string;
+  preparation_time?: string;
+  shipping_provider?: string;
+  shipping_cost_thb?: number;
+  free_shipping?: boolean;
+  listing_status?: "draft" | "pending_review" | "changes_requested" | "active" | "paused" | "out_of_stock" | "archived";
+  sale_unit?: "meter" | "piece" | "roll" | "set";
+  width_cm?: number;
+  length_cm?: number;
+  weight_g?: number;
+  fiber_composition?: string;
+  primary_color?: string;
+  dye_method?: string;
+  pattern_name?: string;
+  texture?: string;
+  production_method?: string;
+  production_origin?: string;
+  care_instructions?: string;
+  available_at?: string;
+  published_at?: string;
+  passport?: {
+    code: string;
+    status: "seller_declared" | "pending_verification" | "verified" | "revoked";
+    issued_at?: string;
+  } | null;
   images: string[];
   variants?: ProductVariant[];
   fabric_id?: number;
@@ -111,6 +141,7 @@ export interface SearchResult {
   weave_technique?: string;
   dye_method?: string;
   cultural_meaning_th?: string;
+  cultural_meaning_en?: string;
   story_tags?: StoryTags;
   usage_rights: string;
   artisan_name?: string;

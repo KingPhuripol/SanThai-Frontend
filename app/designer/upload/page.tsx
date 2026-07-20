@@ -33,6 +33,7 @@ export default function DesignerUploadPage() {
   const [generatingImage, setGeneratingImage] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
   const [genError, setGenError] = useState("");
+  const [sourceProduct, setSourceProduct] = useState<any>(null);
 
   const [form, setForm] = useState({
     title_th: "",
@@ -45,6 +46,16 @@ export default function DesignerUploadPage() {
   useEffect(() => {
     fabricsApi.list().then(setFabrics).catch(console.error);
   }, []);
+
+  useEffect(() => {
+    if (!form.fabric_id) {
+      setSourceProduct(null);
+      return;
+    }
+    productsApi.list().then((products) => {
+      setSourceProduct(products.find((product: any) => Number(product.fabric_id) === Number(form.fabric_id)) || null);
+    }).catch(() => setSourceProduct(null));
+  }, [form.fabric_id]);
 
   const set = (key: string, value: any) => setForm((f) => ({ ...f, [key]: value }));
 
@@ -224,16 +235,18 @@ export default function DesignerUploadPage() {
             </div>
             {genError && <p className="text-xs text-red-500 mt-2">{genError}</p>}
             {generatedImageUrl && (
-              <div className="mt-3">
+              <div className="relative mt-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={generatedImageUrl}
                   alt="AI generated preview"
                   className="w-full max-h-72 object-cover rounded-xl border border-purple-200"
                 />
+                {sourceProduct && <Link href={`/marketplace/${sourceProduct.id}`} className="absolute bottom-3 left-3 rounded-full bg-brand-900/95 px-3 py-2 text-xs font-bold text-white shadow-lg hover:bg-brand-800">ผ้าต้นทาง · ดูสินค้า</Link>}
                 <p className="text-xs text-purple-700 mt-1.5">
-                  ✓ จะใช้ภาพนี้เป็นรูปสินค้า — สร้างใหม่ได้ถ้ายังไม่พอใจ
+                  ✓ จะใช้ภาพนี้เป็นรูปสินค้า — สร้างใหม่ได้ถ้ายังไม่พอใจ {sourceProduct ? "· ปุ่มบนภาพพาไปยังผ้าต้นทาง" : ""}
                 </p>
+                <p className="mt-1 text-[11px] text-brand-900/55">ภาพนี้เป็นภาพตัวอย่างจาก AI โดยใช้รูปผ้าอ้างอิง ไม่ใช่การรับรองคุณสมบัติของผ้า</p>
               </div>
             )}
           </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Clock } from "lucide-react";
+import { useLanguage } from "@/components/LanguageProvider";
 
 function formatRemaining(ms: number): string {
   if (ms <= 0) return "00:00";
@@ -12,6 +13,7 @@ function formatRemaining(ms: number): string {
 }
 
 export function ReservationCountdown({ reservedUntil }: { reservedUntil: string }) {
+  const { locale } = useLanguage();
   const target = new Date(reservedUntil).getTime();
   const [remaining, setRemaining] = useState(() => target - Date.now());
 
@@ -34,8 +36,8 @@ export function ReservationCountdown({ reservedUntil }: { reservedUntil: string 
     >
       <Clock size={13} />
       {expired
-        ? "หมดเวลาชำระเงินแล้ว การจองอาจถูกยกเลิก"
-        : `กรุณาชำระเงินภายใน ${formatRemaining(remaining)} มิฉะนั้นการจองจะถูกยกเลิกอัตโนมัติ`}
+        ? (locale === "en" ? "The payment window has expired; this reservation may be cancelled." : "หมดเวลาชำระเงินแล้ว การจองอาจถูกยกเลิก")
+        : (locale === "en" ? `Pay within ${formatRemaining(remaining)} or this reservation will be cancelled automatically.` : `กรุณาชำระเงินภายใน ${formatRemaining(remaining)} มิฉะนั้นการจองจะถูกยกเลิกอัตโนมัติ`)}
     </div>
   );
 }

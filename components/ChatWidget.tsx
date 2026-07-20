@@ -4,22 +4,21 @@ import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Bot, Loader2 } from "lucide-react";
 import { chatApi } from "@/lib/api";
 import type { ChatMessage } from "@/lib/types";
+import { useLanguage } from "@/components/LanguageProvider";
 
 let globalSessionId = "";
 
 export default function ChatWidget() {
+  const { locale } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      role: "assistant",
-      content:
-        'สวัสดีครับ ผมคือสานไทย 👋 ช่วยแนะนำลายผ้าไทยให้คุณได้เลย ลองถามเช่น "ลายผ้าเหมาะสำหรับงานแต่งงาน" หรือ "ผ้าไหมจากอีสานมีอะไรบ้าง?"',
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMessages([{ role: "assistant", content: locale === "en" ? "Hello, I’m SanThai 👋 I can help you discover Thai textiles. Try asking about wedding patterns or silk from the Northeast." : 'สวัสดีครับ ผมคือสานไทย 👋 ช่วยแนะนำลายผ้าไทยให้คุณได้เลย ลองถามเช่น "ลายผ้าเหมาะสำหรับงานแต่งงาน" หรือ "ผ้าไหมจากอีสานมีอะไรบ้าง?"', timestamp: new Date() }]);
+  }, [locale]);
 
   useEffect(() => {
     if (!globalSessionId) {
@@ -58,7 +57,7 @@ export default function ChatWidget() {
         ...prev,
         {
           role: "assistant",
-          content: "ขออภัยครับ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
+          content: locale === "en" ? "Sorry, something went wrong. Please try again." : "ขออภัยครับ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
           timestamp: new Date(),
         },
       ]);
@@ -73,7 +72,7 @@ export default function ChatWidget() {
       <button
         onClick={() => setOpen((v) => !v)}
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-brand-900 text-white shadow-lg hover:bg-gold-600 transition-all duration-200 flex items-center justify-center"
-        aria-label="เปิด chatbot"
+        aria-label={locale === "en" ? "Open chatbot" : "เปิด chatbot"}
       >
         {open ? <X size={22} /> : <MessageCircle size={22} />}
       </button>
@@ -90,8 +89,8 @@ export default function ChatWidget() {
               <Bot size={18} className="text-brand-900" />
             </div>
             <div>
-              <p className="text-white font-semibold text-sm">สานไทยสนทนา</p>
-              <p className="text-amber-200 text-xs">ผู้เชี่ยวชาญผ้าไทย AI</p>
+              <p className="text-white font-semibold text-sm">{locale === "en" ? "SanThai Chat" : "สานไทยสนทนา"}</p>
+              <p className="text-amber-200 text-xs">{locale === "en" ? "AI Thai textile guide" : "ผู้เชี่ยวชาญผ้าไทย AI"}</p>
             </div>
           </div>
 
@@ -117,7 +116,7 @@ export default function ChatWidget() {
               <div className="flex justify-start">
                 <div className="bg-white border border-amber-100 rounded-2xl rounded-tl-sm px-3 py-2 text-sm text-brand-400 flex items-center gap-2 shadow-sm">
                   <Loader2 size={14} className="animate-spin" />
-                  กำลังคิด…
+                  {locale === "en" ? "Thinking…" : "กำลังคิด…"}
                 </div>
               </div>
             )}
@@ -126,7 +125,7 @@ export default function ChatWidget() {
 
           {/* Quick prompts */}
           <div className="px-3 pt-2 pb-1 flex gap-2 overflow-x-auto scrollbar-none bg-white border-t border-amber-50">
-            {["งานแต่งงาน", "ผ้าไหมอีสาน", "ลายสมัยใหม่"].map((prompt) => (
+            {(locale === "en" ? ["Wedding textiles", "Northeastern silk", "Modern patterns"] : ["งานแต่งงาน", "ผ้าไหมอีสาน", "ลายสมัยใหม่"]).map((prompt) => (
               <button
                 key={prompt}
                 onClick={() => {
@@ -146,7 +145,7 @@ export default function ChatWidget() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && send()}
-              placeholder="พิมพ์คำถามได้เลย…"
+              placeholder={locale === "en" ? "Ask a question…" : "พิมพ์คำถามได้เลย…"}
               className="flex-1 text-sm px-3 py-2 rounded-full border border-amber-200 bg-stone-50 focus:outline-none focus:border-gold-400 placeholder-brand-300"
             />
             <button

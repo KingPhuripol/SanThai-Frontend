@@ -59,7 +59,7 @@ export default async function FabricDigitalIDPage({ params }: Props) {
             <Image
               src={
                 fabric.image_url ||
-                `https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80`
+                `https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric.jpg`
               }
               alt={fabric.name_th}
               fill
@@ -72,7 +72,7 @@ export default async function FabricDigitalIDPage({ params }: Props) {
           {/* QR Code card */}
           <div className="bg-white rounded-2xl border border-amber-100 p-4 text-center shadow-sm">
             <p className="text-xs text-brand-400 mb-2 font-medium uppercase tracking-wide">
-              Digital ID — สแกนเพื่อยืนยัน
+              SanThai Passport — ตรวจสอบข้อมูลผ้า
             </p>
             <div className="flex justify-center">
               <QRCodeSVG

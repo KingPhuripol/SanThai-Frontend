@@ -109,7 +109,7 @@ export default function ArtisanDashboardPage() {
   return (
     <div className="min-h-screen bg-stone-50 pb-20">
       {/* Header */}
-      <div className="bg-brand-900 py-10 px-4 text-white">
+      <div className="bg-brand-900 pt-28 pb-14 px-4 text-white">
         <div className="max-w-5xl mx-auto flex items-end justify-between">
           <div>
             <p className="text-amber-300 text-sm">Dashboard ช่างทอ</p>
@@ -241,7 +241,7 @@ export default function ArtisanDashboardPage() {
                       href={`/fabric/${f.id}`}
                       className="text-xs text-brand-500 hover:text-brand-900 underline shrink-0"
                     >
-                      Digital ID
+                      SanThai Passport
                     </Link>
                   </div>
                 </div>

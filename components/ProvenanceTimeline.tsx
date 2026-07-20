@@ -1,5 +1,6 @@
 import { ShieldCheck, ShieldAlert } from "lucide-react";
 import type { ProvenanceEvent } from "@/lib/types";
+import { useLanguage } from "@/components/LanguageProvider";
 
 const EVENT_CONFIG: Record<
   string,
@@ -30,6 +31,8 @@ export default function ProvenanceTimeline({
   events,
   chainValid,
 }: ProvenanceTimelineProps) {
+  const { locale, pick } = useLanguage();
+  const labelsEn: Record<string, string> = { raw_material: "Raw material", dyeing: "Dyeing", weaving: "Weaving", finished: "Finished", listed: "Listed", sold: "Sold" };
   return (
     <div>
       {/* Chain status */}
@@ -42,8 +45,8 @@ export default function ProvenanceTimeline({
       >
         {chainValid ? <ShieldCheck size={16} /> : <ShieldAlert size={16} />}
         {chainValid
-          ? `ตรวจสอบแล้ว — Hash chain สมบูรณ์ (${events.length} เหตุการณ์)`
-          : "คำเตือน: ไม่สามารถยืนยัน hash chain ได้"}
+          ? (locale === "en" ? `Verified — hash chain intact (${events.length} events)` : `ตรวจสอบแล้ว — Hash chain สมบูรณ์ (${events.length} เหตุการณ์)`)
+          : (locale === "en" ? "Warning: the hash chain could not be verified." : "คำเตือน: ไม่สามารถยืนยัน hash chain ได้")}
       </div>
 
       {/* Timeline */}
@@ -75,10 +78,10 @@ export default function ProvenanceTimeline({
                     <span
                       className={`text-xs font-semibold uppercase tracking-wide ${cfg.color}`}
                     >
-                      {cfg.label}
+                      {locale === "en" ? labelsEn[event.event_type] || cfg.label : cfg.label}
                     </span>
                     <span className="text-xs text-brand-400">
-                      {new Date(event.timestamp).toLocaleDateString("th-TH", {
+                      {new Date(event.timestamp).toLocaleDateString(locale === "en" ? "en-US" : "th-TH", {
                         year: "numeric",
                         month: "short",
                         day: "numeric",
@@ -94,9 +97,9 @@ export default function ProvenanceTimeline({
                       📍 {event.location}
                     </p>
                   )}
-                  {event.description_th && (
+                  {(event.description_th || event.description_en) && (
                     <p className="text-xs text-brand-600 mt-1 leading-relaxed">
-                      {event.description_th}
+                      {pick(event.description_th, event.description_en)}
                     </p>
                   )}
 

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, X, Search, ShoppingBag, Heart, User } from "lucide-react";
 import { clearSession, getSession, Session, SESSION_CHANGED_EVENT } from "@/lib/auth";
+import { LanguageSwitcher, useLanguage } from "@/components/LanguageProvider";
 
 const CART_KEY = "santhai_cart";
 const CART_CHANGED_EVENT = "santhai-cart-changed";
@@ -23,6 +24,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [cartCount, setCartCount] = useState(0);
+  const { t, pick } = useLanguage();
 
   useEffect(() => {
     setSession(getSession());
@@ -45,20 +47,19 @@ export default function Navbar() {
   }, []);
 
   const baseLinks = [
-    { href: "/", label: "หน้าหลัก" },
-    { href: "/quiz", label: "ค้นหาตัวตน" },
-    { href: "/marketplace", label: "ตลาดผ้า" },
-    { href: "/library", label: "ห้องสมุดผ้า" },
-    { href: "/community", label: "ชุมชนผู้สร้างสรรค์" },
-    { href: "/about", label: "เกี่ยวกับเรา" },
+    { href: "/", label: t("home") },
+    { href: "/quiz", label: t("identity") },
+    { href: "/marketplace", label: t("marketplace") },
+    { href: "/community", label: t("community") },
+    { href: "/about", label: t("about") },
   ];
 
   // Dynamic links based on role
   const roleLinks = [];
   if (session?.role === "artisan" || session?.role === "designer") {
-    roleLinks.push({ href: "/store", label: "การจัดการร้านค้า" });
+    roleLinks.push({ href: "/store", label: t("store") });
   }
-  roleLinks.push({ href: "/fabric-verification", label: "ตรวจสอบผ้า" });
+  roleLinks.push({ href: "/fabric-verification", label: t("verifyFabric") });
 
   const allLinks = [...baseLinks, ...roleLinks];
 
@@ -80,7 +81,7 @@ export default function Navbar() {
               SanThai
             </span>
             <span className="text-[11px] text-white/80 font-medium tracking-widest mt-1">
-              ผ้าไทย ใส่ได้ทุกตัวตน
+              {t("thaiForEveryIdentity")}
             </span>
           </div>
         </Link>
@@ -101,7 +102,8 @@ export default function Navbar() {
         </div>
 
         {/* Right actions */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
+          <LanguageSwitcher dark />
           <button className="hidden sm:flex text-white hover:text-gold-300 transition-colors">
             <Search size={20} strokeWidth={1.5} />
           </button>
@@ -135,8 +137,14 @@ export default function Navbar() {
               <div className="absolute right-0 top-10 w-48 bg-white rounded-xl shadow-lg border border-brand-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
                 <div className="px-4 py-2 border-b border-brand-100 mb-1">
                   <p className="text-sm font-bold text-brand-900 truncate">{session.full_name}</p>
-                  <p className="text-xs text-brand-900/60 truncate">{session.role === 'customer' ? 'ผู้ซื้อ' : session.role === 'artisan' ? 'ช่างทอ' : session.role === 'designer' ? 'นักออกแบบ' : 'ผู้ดูแลระบบ'}</p>
+                  <p className="text-xs text-brand-900/60 truncate">{session.role === 'customer' ? t("customer") : session.role === 'artisan' ? t("artisan") : session.role === 'designer' ? t("designer") : t("admin")}</p>
                 </div>
+                <Link
+                  href="/profile"
+                  className="block w-full text-left px-4 py-2 text-sm text-brand-900 hover:bg-brand-50 transition-colors"
+                >
+                  {pick("ตั้งค่าบัญชี", "Profile Settings")}
+                </Link>
                 <button
                   onClick={() => {
                     clearSession();
@@ -145,13 +153,13 @@ export default function Navbar() {
                   }}
                   className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-brand-50 transition-colors"
                 >
-                  ออกจากระบบ
+                  {t("logout")}
                 </button>
               </div>
             </div>
           ) : (
-            <Link href="/login" className="ml-2 block rounded-full overflow-hidden border border-gold-300/30 w-8 h-8">
-              <img src="/uploads/thai_fabric_image_01.jpg" alt="User Profile" className="w-full h-full object-cover" />
+            <Link href="/login" aria-label="เข้าสู่ระบบ" className="ml-2 flex h-8 w-8 items-center justify-center rounded-full border border-gold-300/30 text-gold-300 hover:bg-white/10">
+              <User size={16} />
             </Link>
           )}
 
@@ -180,23 +188,32 @@ export default function Navbar() {
           ))}
           <hr className="border-white/10" />
           <Link href="/cart" onClick={() => setOpen(false)} className="block hover:text-gold-300 transition-colors">
-            ตะกร้าสินค้า ({cartCount})
+            {t("cart")} ({cartCount})
           </Link>
           {session ? (
-            <button
-              onClick={() => {
-                clearSession();
-                setSession(null);
-                setOpen(false);
-                router.push("/");
-              }}
-              className="block w-full text-left text-red-400 hover:text-red-300 transition-colors"
-            >
-              ออกจากระบบ
-            </button>
+            <>
+              <Link
+                href="/profile"
+                onClick={() => setOpen(false)}
+                className="block text-white hover:text-gold-300 transition-colors"
+              >
+                {pick("ตั้งค่าบัญชี", "Profile Settings")}
+              </Link>
+              <button
+                onClick={() => {
+                  clearSession();
+                  setSession(null);
+                  setOpen(false);
+                  router.push("/");
+                }}
+                className="block w-full text-left text-red-400 hover:text-red-300 transition-colors"
+              >
+                {t("logout")}
+              </button>
+            </>
           ) : (
             <Link href="/login" onClick={() => setOpen(false)} className="block text-gold-400 hover:text-gold-300 transition-colors">
-              เข้าสู่ระบบ
+              {t("login")}
             </Link>
           )}
         </div>

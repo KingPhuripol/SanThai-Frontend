@@ -5,8 +5,10 @@ import Link from "next/link";
 import { Package, ChevronLeft, Image as ImageIcon } from "lucide-react";
 import { adminApi, API_URL } from "@/lib/api";
 import { useAdminSession } from "@/lib/useAdminSession";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function AdminOrdersPage() {
+  const { locale } = useLanguage();
   const { session, checked } = useAdminSession();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,15 +29,15 @@ export default function AdminOrdersPage() {
 
   const handleUpdateStatus = async (orderId: number) => {
     const status = prompt(
-      "ระบุสถานะใหม่ (pending / processing / shipped / cancelled):",
+      locale === "en" ? "New status (pending / processing / shipped / cancelled):" : "ระบุสถานะใหม่ (pending / processing / shipped / cancelled):",
       "shipped"
     );
     if (!status) return;
     let trackingNumber: string | null = "";
     let courier = "";
     if (status === "shipped") {
-      trackingNumber = prompt("หมายเลขพัสดุ (Tracking Number):") || "";
-      courier = prompt("ผู้ให้บริการขนส่ง:", "Kerry Express") || "";
+      trackingNumber = prompt(locale === "en" ? "Tracking number:" : "หมายเลขพัสดุ (Tracking Number):") || "";
+      courier = prompt(locale === "en" ? "Courier:" : "ผู้ให้บริการขนส่ง:", "Kerry Express") || "";
     }
 
     try {
@@ -44,10 +46,10 @@ export default function AdminOrdersPage() {
         tracking_number: trackingNumber || undefined,
         courier: courier || undefined,
       });
-      alert("อัปเดตสถานะสำเร็จ!");
+      alert(locale === "en" ? "Status updated." : "อัปเดตสถานะสำเร็จ!");
       fetchOrders();
     } catch (e) {
-      alert("อัปเดตสถานะไม่สำเร็จ: " + e);
+      alert((locale === "en" ? "Could not update status: " : "อัปเดตสถานะไม่สำเร็จ: ") + e);
     }
   };
 
@@ -68,9 +70,9 @@ export default function AdminOrdersPage() {
   return (
     <div className="min-h-screen bg-stone-50 pb-20">
       <div className="bg-white border-b border-brand-200 py-10 px-4 text-center">
-        <h1 className="text-3xl font-bold text-brand-950 thai-serif">ออเดอร์ทั้งระบบ</h1>
+        <h1 className="text-3xl font-bold text-brand-950 thai-serif">{locale === "en" ? "All platform orders" : "ออเดอร์ทั้งระบบ"}</h1>
         <p className="text-brand-950/60 text-xs mt-2 max-w-sm mx-auto leading-relaxed">
-          ดูและแก้ไขสถานะออเดอร์จากช่างทอ/ดีไซเนอร์ทุกคนในแพลตฟอร์ม
+          {locale === "en" ? "View and update orders from every store and designer on the platform." : "ดูและแก้ไขสถานะออเดอร์จากช่างทอ/ดีไซเนอร์ทุกคนในแพลตฟอร์ม"}
         </p>
       </div>
 
@@ -80,7 +82,7 @@ export default function AdminOrdersPage() {
           className="inline-flex items-center gap-1 text-xs font-bold tracking-widest uppercase text-brand-900 hover:text-brand-700 transition-colors mb-6"
         >
           <ChevronLeft size={13} />
-          กลับหน้า Dashboard
+          {locale === "en" ? "Back to dashboard" : "กลับหน้า Dashboard"}
         </Link>
 
         {loading ? (
@@ -90,7 +92,7 @@ export default function AdminOrdersPage() {
         ) : orders.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 text-center border border-amber-100/50 shadow-sm">
             <Package size={48} className="mx-auto text-brand-300 mb-4" />
-            <p className="text-brand-600">ยังไม่มีรายการสั่งซื้อในระบบ</p>
+            <p className="text-brand-600">{locale === "en" ? "There are no orders yet." : "ยังไม่มีรายการสั่งซื้อในระบบ"}</p>
           </div>
         ) : (
           <div className="bg-white rounded-2xl shadow-sm border border-amber-100 overflow-hidden overflow-x-auto">
@@ -98,12 +100,12 @@ export default function AdminOrdersPage() {
               <thead className="bg-brand-50 text-brand-900">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Order ID</th>
-                  <th className="px-4 py-3 font-semibold">สินค้า</th>
-                  <th className="px-4 py-3 font-semibold">ลูกค้า</th>
-                  <th className="px-4 py-3 font-semibold">ยอดชำระ</th>
-                  <th className="px-4 py-3 font-semibold">สลิปการโอน</th>
-                  <th className="px-4 py-3 font-semibold">สถานะ</th>
-                  <th className="px-4 py-3 font-semibold">การกระทำ</th>
+                  <th className="px-4 py-3 font-semibold">{locale === "en" ? "Product" : "สินค้า"}</th>
+                  <th className="px-4 py-3 font-semibold">{locale === "en" ? "Customer" : "ลูกค้า"}</th>
+                  <th className="px-4 py-3 font-semibold">{locale === "en" ? "Payment" : "ยอดชำระ"}</th>
+                  <th className="px-4 py-3 font-semibold">{locale === "en" ? "Payment slip" : "สลิปการโอน"}</th>
+                  <th className="px-4 py-3 font-semibold">{locale === "en" ? "Status" : "สถานะ"}</th>
+                  <th className="px-4 py-3 font-semibold">{locale === "en" ? "Action" : "การกระทำ"}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-amber-50">
@@ -112,33 +114,33 @@ export default function AdminOrdersPage() {
                     <td className="px-4 py-4 font-mono text-xs text-brand-500">#{o.id}</td>
                     <td className="px-4 py-4">
                       <p className="font-semibold text-brand-950">{o.product_title}</p>
-                      <p className="text-xs text-brand-500">จำนวน: {o.quantity} ชิ้น</p>
+                      <p className="text-xs text-brand-500">{locale === "en" ? `Quantity: ${o.quantity}` : `จำนวน: ${o.quantity} ชิ้น`}</p>
                     </td>
                     <td className="px-4 py-4">
                       <p className="text-brand-950">{o.buyer_name}</p>
                       <p className="text-xs text-brand-500">{o.buyer_email}</p>
                     </td>
-                    <td className="px-4 py-4 font-bold text-brand-900">฿{o.total_thb.toLocaleString()}</td>
+                    <td className="px-4 py-4 font-bold text-brand-900">{locale === "en" ? `$${(o.total_thb / 35).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : `฿${o.total_thb.toLocaleString()}`}</td>
                     <td className="px-4 py-4 text-center">
                       {o.slip_url ? (
                         <a href={getSlipUrl(o.slip_url)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-semibold hover:bg-green-100">
                           <ImageIcon size={12} />
-                          ดูสลิป
+                          {locale === "en" ? "View slip" : "ดูสลิป"}
                         </a>
                       ) : (
-                        <span className="text-xs text-stone-400">ยังไม่แนบ</span>
+                        <span className="text-xs text-stone-400">{locale === "en" ? "Not attached" : "ยังไม่แนบ"}</span>
                       )}
                     </td>
                     <td className="px-4 py-4">
                       {o.status === "pending" ? (
-                        <span className="px-2 py-1 bg-stone-100 text-stone-600 rounded-md text-xs font-semibold">รอชำระเงิน</span>
+                        <span className="px-2 py-1 bg-stone-100 text-stone-600 rounded-md text-xs font-semibold">{locale === "en" ? "Awaiting payment" : "รอชำระเงิน"}</span>
                       ) : o.status === "processing" ? (
-                        <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-md text-xs font-semibold">เตรียมจัดส่ง</span>
+                        <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-md text-xs font-semibold">{locale === "en" ? "Preparing shipment" : "เตรียมจัดส่ง"}</span>
                       ) : o.status === "cancelled" ? (
-                        <span className="px-2 py-1 bg-red-100 text-red-700 rounded-md text-xs font-semibold">ยกเลิก</span>
+                        <span className="px-2 py-1 bg-red-100 text-red-700 rounded-md text-xs font-semibold">{locale === "en" ? "Cancelled" : "ยกเลิก"}</span>
                       ) : (
                         <div className="flex flex-col gap-1">
-                          <span className="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs font-semibold inline-block w-fit">จัดส่งแล้ว</span>
+                          <span className="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs font-semibold inline-block w-fit">{locale === "en" ? "Shipped" : "จัดส่งแล้ว"}</span>
                           <span className="text-[10px] text-brand-500 font-mono">{o.tracking_number}</span>
                         </div>
                       )}
@@ -148,7 +150,7 @@ export default function AdminOrdersPage() {
                         onClick={() => handleUpdateStatus(o.id)}
                         className="px-3 py-1.5 bg-brand-900 text-white rounded-lg text-xs font-bold hover:bg-brand-800 transition-colors"
                       >
-                        แก้สถานะ
+                        {locale === "en" ? "Update status" : "แก้สถานะ"}
                       </button>
                     </td>
                   </tr>

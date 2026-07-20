@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import ChatWidget from "@/components/ChatWidget";
+import TrafficTracker from "@/components/TrafficTracker";
+import { LanguageProvider } from "@/components/LanguageProvider";
 
 export const metadata: Metadata = {
   title: "สานไทย — ถักทอภูมิปัญญาไทย สู่โลกดิจิทัล",
@@ -32,9 +34,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body className="font-sarabun bg-brand-900 text-brand-950">
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <ChatWidget />
+        <LanguageProvider>
+          <Navbar />
+          <TrafficTracker />
+          <main className="min-h-screen">{children}</main>
+          <ChatWidget />
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Layers, BadgeCheck } from "lucide-react";
 import type { Product } from "@/lib/types";
+import { useLanguage } from "@/components/LanguageProvider";
 
 interface FabricCardProps {
   product: Product;
@@ -13,6 +14,7 @@ const REGION_LABELS: Record<string, string> = {
   central: "ภาคกลาง",
   south: "ภาคใต้",
 };
+const REGION_LABELS_EN: Record<string, string> = { north: "Northern Thailand", northeast: "Northeastern Thailand", central: "Central Thailand", south: "Southern Thailand" };
 
 /** Tiny Thai diamond for card accents */
 function CardDiamond({ size = 10 }: { size?: number }) {
@@ -33,10 +35,11 @@ function CardDiamond({ size = 10 }: { size?: number }) {
 }
 
 export default function FabricCard({ product }: FabricCardProps) {
+  const { locale, pick } = useLanguage();
   const imageUrl =
     product.images?.[0] ||
     product.fabric?.image_url ||
-    `https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80`;
+    `https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric.jpg`;
 
   return (
     <Link href={`/marketplace/${product.id}`} className="group block">
@@ -66,7 +69,7 @@ export default function FabricCard({ product }: FabricCardProps) {
         <div className="relative h-52 overflow-hidden bg-stone-100 thai-stripe-bg">
           <Image
             src={imageUrl}
-            alt={product.title_th}
+            alt={pick(product.title_th, product.title_en)}
             fill
             className="object-cover group-hover:scale-107 transition-transform duration-600"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -79,14 +82,14 @@ export default function FabricCard({ product }: FabricCardProps) {
           {product.fabric?.usage_rights === "commercial" && (
             <div className="absolute top-2 right-2 bg-white/92 backdrop-blur-sm text-green-700 text-xs font-medium px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
               <BadgeCheck size={10} />
-              ใช้เชิงพาณิชย์ได้
+              {locale === "en" ? "Commercial use" : "ใช้เชิงพาณิชย์ได้"}
             </div>
           )}
 
-          {/* Digital ID badge with Thai diamond */}
+          {/* SanThai Passport badge with Thai diamond */}
           <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-brand-900/85 backdrop-blur-sm text-gold-400 text-xs font-medium px-2.5 py-1 rounded-full">
             <CardDiamond size={8} />
-            Digital ID
+            SanThai Passport
           </div>
 
           {/* Region top-left chip — jade color */}
@@ -95,7 +98,7 @@ export default function FabricCard({ product }: FabricCardProps) {
               className="absolute top-2 left-2 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full"
               style={{ background: "rgba(26,107,90,0.82)" }}
             >
-              {REGION_LABELS[product.community.region] ||
+              {(locale === "en" ? REGION_LABELS_EN[product.community.region] : REGION_LABELS[product.community.region]) ||
                 product.community.region}
             </div>
           )}
@@ -104,9 +107,9 @@ export default function FabricCard({ product }: FabricCardProps) {
         {/* Card body */}
         <div className="p-4">
           <h3 className="font-bold text-brand-900 text-sm leading-snug line-clamp-2 thai-serif">
-            {product.title_th}
+            {pick(product.title_th, product.title_en)}
           </h3>
-          {product.title_en && (
+          {locale === "th" && product.title_en && (
             <p className="text-brand-400 text-[11px] mt-0.5 line-clamp-1 italic">
               {product.title_en}
             </p>
@@ -158,10 +161,10 @@ export default function FabricCard({ product }: FabricCardProps) {
           <div className="mt-3 flex items-end justify-between">
             <div>
               <p className="text-base font-bold text-brand-900 thai-serif">
-                ฿{product.price_thb.toLocaleString()}
+                {locale === "en" ? `$${product.price_usd.toFixed(0)} USD` : `฿${product.price_thb.toLocaleString()}`}
               </p>
               <p className="text-[10px] text-brand-400">
-                ${product.price_usd.toFixed(0)} USD
+                {locale === "en" ? `฿${product.price_thb.toLocaleString()}` : `$${product.price_usd.toFixed(0)} USD`}
               </p>
             </div>
             <span
@@ -171,7 +174,7 @@ export default function FabricCard({ product }: FabricCardProps) {
                   : "bg-red-50 text-red-600 border border-red-200"
               }`}
             >
-              {product.stock > 0 ? `เหลือ ${product.stock} ชิ้น` : "หมดแล้ว"}
+              {product.stock > 0 ? (locale === "en" ? `${product.stock} available` : `เหลือ ${product.stock} ชิ้น`) : (locale === "en" ? "Sold out" : "หมดแล้ว")}
             </span>
           </div>
         </div>

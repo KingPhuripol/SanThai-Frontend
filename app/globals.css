@@ -333,3 +333,13 @@ h4 {
 .thai-serif {
   font-family: var(--font-thai-serif), var(--font-sarabun), sans-serif;
 }
+
+.field {
+  width: 100%;
+  border: 1px solid #f2d9a2;
+  border-radius: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+}
+.field:focus { box-shadow: 0 0 0 2px #fbd076; border-color: transparent; }

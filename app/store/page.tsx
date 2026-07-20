@@ -16,8 +16,10 @@ import {
   MessageSquare
 } from "lucide-react";
 import { getSession, Session } from "@/lib/auth";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function StoreDashboardPage() {
+  const { locale } = useLanguage();
   const router = useRouter();
   const [session, setSession] = useState<Session | null>(null);
 
@@ -43,8 +45,8 @@ export default function StoreDashboardPage() {
               {session.full_name.charAt(0)}
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-brand-950 thai-serif">การจัดการร้านค้า</h1>
-              <p className="text-brand-900/60 text-sm">ยินดีต้อนรับ, {session.full_name}</p>
+              <h1 className="text-2xl font-bold text-brand-950 thai-serif">{locale === "en" ? "Store management" : "การจัดการร้านค้า"}</h1>
+              <p className="text-brand-900/60 text-sm">{locale === "en" ? "Welcome, " : "ยินดีต้อนรับ, "}{session.full_name}</p>
             </div>
           </div>
           <Link
@@ -52,7 +54,7 @@ export default function StoreDashboardPage() {
             className="inline-flex items-center gap-2 bg-gradient-to-r from-brand-900 to-brand-800 text-white px-6 py-3 rounded-full font-bold shadow-lg shadow-brand-900/20 hover:scale-105 transition-transform"
           >
             <Plus size={20} className="text-gold-400" />
-            เพิ่มสินค้าใหม่
+            {locale === "en" ? "Add product" : "เพิ่มสินค้าใหม่"}
           </Link>
         </div>
 
@@ -66,7 +68,7 @@ export default function StoreDashboardPage() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-brand-950 flex items-center gap-2">
                   <Settings size={20} className="text-brand-900/60" />
-                  ตั้งค่าร้านค้า
+                  {locale === "en" ? "Store settings" : "ตั้งค่าร้านค้า"}
                 </h2>
                 <button className="text-brand-900/40 hover:text-brand-900 transition-colors">
                   <ChevronRight size={20} />
@@ -74,11 +76,11 @@ export default function StoreDashboardPage() {
               </div>
               <div className="bg-brand-50 p-4 rounded-xl flex flex-col gap-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-brand-900">สมาชิกในร้าน (ช่างทอ)</span>
-                  <span className="text-xs font-bold bg-brand-200 text-brand-900 px-2 py-1 rounded-full">3 คน</span>
+                  <span className="text-sm font-medium text-brand-900">{locale === "en" ? "Store members (weavers)" : "สมาชิกในร้าน (ช่างทอ)"}</span>
+                  <span className="text-xs font-bold bg-brand-200 text-brand-900 px-2 py-1 rounded-full">3 {locale === "en" ? "people" : "คน"}</span>
                 </div>
                 <button className="text-[13px] text-brand-900/60 flex items-center gap-1 hover:text-brand-900 transition-colors mt-2">
-                  <Users size={14} /> จัดการสมาชิก
+                  <Users size={14} /> {locale === "en" ? "Manage members" : "จัดการสมาชิก"}
                 </button>
               </div>
             </div>
@@ -89,11 +91,11 @@ export default function StoreDashboardPage() {
                 <div className="w-12 h-12 rounded-full bg-brand-100 flex items-center justify-center text-brand-900/40 mb-2">
                   <Lock size={24} />
                 </div>
-                <span className="text-sm font-medium text-brand-900/60">ระบบการจัดระดับร้านค้า (เร็วๆ นี้)</span>
+                <span className="text-sm font-medium text-brand-900/60">{locale === "en" ? "Store tier system (coming soon)" : "ระบบการจัดระดับร้านค้า (เร็วๆ นี้)"}</span>
               </div>
               <h2 className="text-lg font-bold text-brand-950 flex items-center gap-2 mb-4">
                 <Store size={20} className="text-brand-900/60" />
-                สถานะร้านค้า
+                {locale === "en" ? "Store status" : "สถานะร้านค้า"}
               </h2>
               <div className="h-24 bg-brand-50 rounded-xl"></div>
             </div>
@@ -107,7 +109,7 @@ export default function StoreDashboardPage() {
             <div className="bg-white rounded-[24px] p-6 shadow-sm border border-brand-200/50">
               <h2 className="text-lg font-bold text-brand-950 flex items-center gap-2 mb-4">
                 <TrendingUp size={20} className="text-brand-900/60" />
-                ภาพรวมธุรกิจ
+                {locale === "en" ? "Business overview" : "ภาพรวมธุรกิจ"}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 
@@ -121,7 +123,7 @@ export default function StoreDashboardPage() {
                     <h3 className="font-bold text-brand-900">Rewards</h3>
                   </div>
                   <p className="text-xs text-brand-900/60 leading-relaxed mb-4">
-                    สะสมคะแนนจากการขายและรีวิวที่ดี เพื่อปลดล็อกสิทธิพิเศษ (ฟีเจอร์กำลังพัฒนา)
+                    {locale === "en" ? "Earn points from sales and strong reviews to unlock benefits (in development)." : "สะสมคะแนนจากการขายและรีวิวที่ดี เพื่อปลดล็อกสิทธิพิเศษ (ฟีเจอร์กำลังพัฒนา)"}
                   </p>
                   <div className="h-2 w-full bg-brand-900/5 rounded-full overflow-hidden">
                     <div className="h-full w-0 bg-gold-400"></div>
@@ -137,10 +139,10 @@ export default function StoreDashboardPage() {
                     <h3 className="font-bold text-brand-900">Insights & News</h3>
                   </div>
                   <p className="text-xs text-brand-900/60 leading-relaxed mb-4">
-                    ติดตามข่าวสาร คำแนะนำการเพิ่มยอดขาย และเทรนด์ตลาดผ้าไทยจากทีมงาน (ฟีเจอร์กำลังพัฒนา)
+                    {locale === "en" ? "Follow news, sales guidance, and Thai textile market trends (in development)." : "ติดตามข่าวสาร คำแนะนำการเพิ่มยอดขาย และเทรนด์ตลาดผ้าไทยจากทีมงาน (ฟีเจอร์กำลังพัฒนา)"}
                   </p>
                   <button className="text-[13px] font-bold text-brand-900 flex items-center gap-1 hover:gap-2 transition-all">
-                    ดูทั้งหมด <ChevronRight size={14} />
+                    {locale === "en" ? "View all" : "ดูทั้งหมด"} <ChevronRight size={14} />
                   </button>
                 </div>
 
@@ -152,10 +154,10 @@ export default function StoreDashboardPage() {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold text-brand-950 flex items-center gap-2">
                   <Package size={20} className="text-brand-900/60" />
-                  จัดการสินค้าของร้าน
+                  {locale === "en" ? "Manage store products" : "จัดการสินค้าของร้าน"}
                 </h2>
                 <Link href="/store/products" className="text-[13px] font-bold text-brand-900 hover:text-brand-700 transition-colors flex items-center gap-1">
-                  ดูสินค้าทั้งหมด <ChevronRight size={14} />
+                  {locale === "en" ? "View all products" : "ดูสินค้าทั้งหมด"} <ChevronRight size={14} />
                 </Link>
               </div>
 
@@ -163,11 +165,11 @@ export default function StoreDashboardPage() {
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <Link href="/store/products/add" className="bg-brand-50 hover:bg-brand-100 transition-colors p-4 rounded-xl flex flex-col items-center justify-center gap-2 border border-brand-100 text-brand-900">
                   <Plus size={24} />
-                  <span className="text-sm font-bold">เพิ่มสินค้าใหม่</span>
+                  <span className="text-sm font-bold">{locale === "en" ? "Add product" : "เพิ่มสินค้าใหม่"}</span>
                 </Link>
                 <Link href="/store/products" className="bg-brand-50 hover:bg-brand-100 transition-colors p-4 rounded-xl flex flex-col items-center justify-center gap-2 border border-brand-100 text-brand-900">
                   <Settings size={24} />
-                  <span className="text-sm font-bold">แก้ไข / ลบ สินค้า</span>
+                  <span className="text-sm font-bold">{locale === "en" ? "Edit / delete products" : "แก้ไข / ลบ สินค้า"}</span>
                 </Link>
               </div>
             </div>
@@ -177,10 +179,10 @@ export default function StoreDashboardPage() {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold text-brand-950 flex items-center gap-2">
                   <TrendingUp size={20} className="text-brand-900/60" />
-                  จัดการคำสั่งซื้อล่าสุด
+                  {locale === "en" ? "Manage recent orders" : "จัดการคำสั่งซื้อล่าสุด"}
                 </h2>
                 <button className="text-[13px] font-bold text-brand-900 hover:text-brand-700 transition-colors">
-                  ดูออเดอร์ทั้งหมด
+                  {locale === "en" ? "View all orders" : "ดูออเดอร์ทั้งหมด"}
                 </button>
               </div>
 
@@ -189,9 +191,9 @@ export default function StoreDashboardPage() {
                 <div className="w-16 h-16 bg-brand-50 rounded-full flex items-center justify-center text-brand-900/30 mb-4">
                   <Package size={32} strokeWidth={1.5} />
                 </div>
-                <h3 className="text-brand-900 font-bold mb-1">ยังไม่มีคำสั่งซื้อ</h3>
+                <h3 className="text-brand-900 font-bold mb-1">{locale === "en" ? "No orders yet" : "ยังไม่มีคำสั่งซื้อ"}</h3>
                 <p className="text-sm text-brand-900/50 max-w-[250px]">
-                  เมื่อมีลูกค้าสั่งซื้อสินค้า รายการออเดอร์จะแสดงที่นี่
+                  {locale === "en" ? "Orders will appear here when customers make purchases." : "เมื่อมีลูกค้าสั่งซื้อสินค้า รายการออเดอร์จะแสดงที่นี่"}
                 </p>
               </div>
             </div>

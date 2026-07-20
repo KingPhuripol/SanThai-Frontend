@@ -54,7 +54,7 @@ export default function DesignerDashboardPage() {
   return (
     <div className="min-h-screen bg-stone-50 pb-20">
       {/* Header */}
-      <div className="bg-brand-900 py-12 px-4 text-center text-white relative overflow-hidden">
+      <div className="bg-brand-900 pt-28 pb-16 px-4 text-center text-white relative overflow-hidden">
         <h1 className="text-3xl font-bold mb-2 thai-serif">ดีไซเนอร์สตูดิโอ</h1>
         <p className="text-amber-200/80 text-sm">ยินดีต้อนรับ, {session.full_name}</p>
         <div className="flex items-center justify-center gap-2 mt-4">

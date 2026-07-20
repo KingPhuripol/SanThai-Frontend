@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Users, Package, TrendingUp, ShoppingBag, Heart, LogOut } from "lucide-react";
+import { Users, Package, TrendingUp, ShoppingBag, Heart, LogOut, Handshake } from "lucide-react";
 import { adminApi } from "@/lib/api";
 import { useAdminSession } from "@/lib/useAdminSession";
 import { clearSession } from "@/lib/auth";
+import { useLanguage } from "@/components/LanguageProvider";
 
 function StatCard({
   title,
@@ -35,6 +36,7 @@ function StatCard({
 }
 
 export default function AdminDashboardPage() {
+  const { locale } = useLanguage();
   const router = useRouter();
   const { session, checked } = useAdminSession();
   const [stats, setStats] = useState<any>(null);
@@ -68,11 +70,11 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-h-screen bg-stone-50 pb-20">
-      <div className="bg-brand-900 py-10 px-4 text-white">
+      <div className="bg-brand-900 pt-28 pb-14 px-4 text-white">
         <div className="max-w-5xl mx-auto flex items-end justify-between">
           <div>
             <p className="text-amber-300 text-sm">Admin Dashboard</p>
-            <h1 className="text-2xl font-bold mt-1">ภาพรวมแพลตฟอร์ม สานไทย</h1>
+            <h1 className="text-2xl font-bold mt-1">{locale === "en" ? "SanThai platform overview" : "ภาพรวมแพลตฟอร์ม สานไทย"}</h1>
           </div>
           <div className="flex gap-2">
             <Link
@@ -80,21 +82,23 @@ export default function AdminDashboardPage() {
               className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-sm font-bold px-4 py-2 rounded-full transition-colors"
             >
               <Users size={15} />
-              ผู้ใช้งาน
+              {locale === "en" ? "Users" : "ผู้ใช้งาน"}
             </Link>
             <Link
               href="/admin/orders"
               className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-sm font-bold px-4 py-2 rounded-full transition-colors"
             >
               <Package size={15} />
-              ออเดอร์ทั้งหมด
+              {locale === "en" ? "All orders" : "ออเดอร์ทั้งหมด"}
             </Link>
+            <Link href="/admin/partners" className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-sm font-bold px-4 py-2 rounded-full transition-colors"><Handshake size={15}/> Partner CRM</Link>
+            <Link href="/admin/reports" className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-sm font-bold px-4 py-2 rounded-full transition-colors"><TrendingUp size={15}/> Reports</Link>
             <button
               onClick={handleLogout}
               className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white/80 text-sm font-bold px-4 py-2 rounded-full transition-colors"
             >
               <LogOut size={15} />
-              ออกจากระบบ
+              {locale === "en" ? "Log out" : "ออกจากระบบ"}
             </button>
           </div>
         </div>
@@ -103,35 +107,35 @@ export default function AdminDashboardPage() {
       <div className="max-w-5xl mx-auto px-4 -mt-4">
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
           <StatCard
-            title="รายได้รวมทั้งแพลตฟอร์ม"
-            value={`฿${stats.total_revenue_thb.toLocaleString()}`}
+            title={locale === "en" ? "Total platform revenue" : "รายได้รวมทั้งแพลตฟอร์ม"}
+            value={locale === "en" ? `$${stats.total_revenue_usd.toLocaleString()} USD` : `฿${stats.total_revenue_thb.toLocaleString()}`}
             sub={`$${stats.total_revenue_usd.toFixed(0)} USD`}
             icon={<TrendingUp size={20} />}
           />
           <StatCard
-            title="ออเดอร์สำเร็จ/กำลังดำเนินการ"
+            title={locale === "en" ? "Completed / in-progress orders" : "ออเดอร์สำเร็จ/กำลังดำเนินการ"}
             value={String(stats.total_orders)}
-            sub={`ยกเลิก/หมดเวลา ${stats.cancelled_orders} รายการ`}
+            sub={locale === "en" ? `${stats.cancelled_orders} cancelled / expired` : `ยกเลิก/หมดเวลา ${stats.cancelled_orders} รายการ`}
             icon={<ShoppingBag size={20} />}
           />
           <StatCard
-            title="ส่วนแบ่งชุมชนรวม (30%)"
-            value={`฿${stats.total_community_share_thb.toLocaleString()}`}
+            title={locale === "en" ? "Community share (30%)" : "ส่วนแบ่งชุมชนรวม (30%)"}
+            value={locale === "en" ? `$${(stats.total_community_share_thb / 35).toLocaleString(undefined, { maximumFractionDigits: 0 })} USD` : `฿${stats.total_community_share_thb.toLocaleString()}`}
             icon={<Heart size={20} />}
           />
           <StatCard
-            title="ผู้ใช้งานทั้งหมด"
+            title={locale === "en" ? "Total users" : "ผู้ใช้งานทั้งหมด"}
             value={String(stats.total_users)}
-            sub={`ช่างทอ ${stats.users_by_role.artisan} · ดีไซเนอร์ ${stats.users_by_role.designer} · ลูกค้า ${stats.users_by_role.customer}`}
+            sub={locale === "en" ? `Stores ${stats.users_by_role.artisan} · Designers ${stats.users_by_role.designer} · Customers ${stats.users_by_role.customer}` : `ช่างทอ ${stats.users_by_role.artisan} · ดีไซเนอร์ ${stats.users_by_role.designer} · ลูกค้า ${stats.users_by_role.customer}`}
             icon={<Users size={20} />}
           />
           <StatCard
-            title="สินค้าที่ลงขาย"
+            title={locale === "en" ? "Listed products" : "สินค้าที่ลงขาย"}
             value={String(stats.total_products)}
             icon={<Package size={20} />}
           />
           <StatCard
-            title="ลายผ้าที่ลงทะเบียน"
+            title={locale === "en" ? "Registered fabric patterns" : "ลายผ้าที่ลงทะเบียน"}
             value={String(stats.total_fabrics)}
             icon={<Package size={20} />}
           />

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Lock, User, Loader2 } from "lucide-react";
 import { authApi } from "@/lib/api";
 import { saveSession } from "@/lib/auth";
+import { useLanguage } from "@/components/LanguageProvider";
 
 function LoginForm() {
   const router = useRouter();
@@ -15,11 +16,12 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const { locale } = useLanguage();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username || !password) {
-      setError("กรุณากรอกอีเมลและรหัสผ่าน");
+      setError(locale === "en" ? "Please enter your email and password." : "กรุณากรอกอีเมลและรหัสผ่าน");
       return;
     }
 
@@ -40,7 +42,7 @@ function LoginForm() {
         router.push("/marketplace");
       }
     } catch {
-      setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+      setError(locale === "en" ? "Incorrect email or password." : "อีเมลหรือรหัสผ่านไม่ถูกต้อง");
     } finally {
       setSubmitting(false);
     }
@@ -50,17 +52,17 @@ function LoginForm() {
     <div className="min-h-screen bg-stone-50 flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-amber-100 overflow-hidden">
         <div className="bg-brand-900 p-8 text-center text-white">
-          <h1 className="text-3xl font-bold thai-serif">เข้าสู่ระบบ</h1>
-          <p className="text-sm text-brand-200 mt-2">sacit Craft Marketplace · สานไทย</p>
+          <h1 className="text-3xl font-bold thai-serif">{locale === "en" ? "Log in" : "เข้าสู่ระบบ"}</h1>
+          <p className="text-sm text-brand-200 mt-2">SanThai Craft Marketplace</p>
         </div>
         
         <form onSubmit={handleLogin} className="p-8 space-y-6">
           <p className="text-xs text-center text-stone-400 -mt-2 mb-2">
-            รองรับทุกบัญชี — ช่างทอผ้า / นักออกแบบ / ลูกค้า
+            {locale === "en" ? "For store, designer and customer accounts" : "รองรับทุกบัญชี — ร้านค้า / นักออกแบบ / ลูกค้า"}
           </p>
 
           <div>
-            <label className="block text-sm font-semibold text-brand-900 mb-2">อีเมล</label>
+            <label className="block text-sm font-semibold text-brand-900 mb-2">{locale === "en" ? "Email" : "อีเมล"}</label>
             <div className="relative">
               <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
               <input
@@ -68,13 +70,13 @@ function LoginForm() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all text-sm"
-                placeholder="กรอกอีเมลของคุณ..."
+                placeholder={locale === "en" ? "Enter your email…" : "กรอกอีเมลของคุณ..."}
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-brand-900 mb-2">รหัสผ่าน</label>
+            <label className="block text-sm font-semibold text-brand-900 mb-2">{locale === "en" ? "Password" : "รหัสผ่าน"}</label>
             <div className="relative">
               <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
               <input
@@ -82,7 +84,7 @@ function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all text-sm"
-                placeholder="กรอกรหัสผ่าน..."
+                placeholder={locale === "en" ? "Enter your password…" : "กรอกรหัสผ่าน..."}
               />
             </div>
           </div>
@@ -95,13 +97,13 @@ function LoginForm() {
             className="w-full py-4 bg-brand-900 hover:bg-brand-800 text-white font-bold tracking-widest uppercase transition-colors rounded-xl shadow-md mt-4 flex items-center justify-center gap-2 disabled:opacity-60"
           >
             {submitting && <Loader2 size={16} className="animate-spin" />}
-            {submitting ? "กำลังเข้าสู่ระบบ…" : "เข้าสู่ระบบ"}
+            {submitting ? (locale === "en" ? "Signing in…" : "กำลังเข้าสู่ระบบ…") : (locale === "en" ? "Log in" : "เข้าสู่ระบบ")}
           </button>
 
           <p className="text-xs text-center text-stone-400 mt-4">
-            ยังไม่มีบัญชี?{" "}
+            {locale === "en" ? "Don’t have an account? " : "ยังไม่มีบัญชี? "}
             <Link href="/register" className="text-brand-700 font-semibold hover:underline">
-              สมัครสมาชิกที่นี่
+              {locale === "en" ? "Create an account" : "สมัครสมาชิกที่นี่"}
             </Link>
           </p>
         </form>

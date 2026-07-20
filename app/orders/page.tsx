@@ -7,15 +7,26 @@ import { ChevronLeft, Package, Image as ImageIcon } from "lucide-react";
 import { getSession } from "@/lib/auth";
 import { ordersApi, API_URL, productsApi } from "@/lib/api";
 import { ReservationCountdown } from "@/components/ReservationCountdown";
+import { useLanguage } from "@/components/LanguageProvider";
 
 const STATUS_LABEL: Record<string, { label: string; className: string }> = {
   pending: { label: "รอชำระเงิน", className: "bg-stone-100 text-stone-600" },
+  payment_pending_review: { label: "รอตรวจสอบการชำระเงิน", className: "bg-amber-100 text-amber-700" },
+  paid: { label: "ชำระเงินแล้ว", className: "bg-green-100 text-green-700" },
   processing: { label: "เตรียมจัดส่ง", className: "bg-amber-100 text-amber-700" },
+  preparing: { label: "กำลังจัดเตรียมสินค้า", className: "bg-amber-100 text-amber-700" },
+  packed: { label: "เตรียมส่งแล้ว", className: "bg-blue-100 text-blue-700" },
   shipped: { label: "จัดส่งแล้ว", className: "bg-green-100 text-green-700" },
+  delivered: { label: "จัดส่งถึงแล้ว", className: "bg-green-100 text-green-700" },
+  completed: { label: "สำเร็จ", className: "bg-green-100 text-green-700" },
+  refund_requested: { label: "กำลังตรวจสอบคำขอคืนเงิน", className: "bg-red-100 text-red-700" },
+  refunded: { label: "คืนเงินแล้ว", className: "bg-red-100 text-red-700" },
+  dispute_open: { label: "อยู่ระหว่างตรวจสอบข้อพิพาท", className: "bg-red-100 text-red-700" },
   cancelled: { label: "ยกเลิก (หมดเวลาชำระเงิน)", className: "bg-red-100 text-red-700" },
 };
 
 export default function MyOrdersPage() {
+  const { locale } = useLanguage();
   const router = useRouter();
   const [checked, setChecked] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
@@ -46,12 +57,20 @@ export default function MyOrdersPage() {
     return `${API_URL}${url}`;
   };
 
+  const formatTime = (value?: string) => value
+    ? new Date(value).toLocaleString(locale === "en" ? "en-US" : "th-TH", { dateStyle: "medium", timeStyle: "short" })
+    : locale === "en" ? "Time unavailable" : "ไม่ระบุเวลา";
+  const statusLabel = (status: string) => {
+    const english: Record<string, string> = { pending: "Awaiting payment", payment_pending_review: "Payment under review", paid: "Paid", processing: "Preparing shipment", preparing: "Preparing product", packed: "Packed", shipped: "Shipped", delivered: "Delivered", completed: "Completed", refund_requested: "Refund request under review", refunded: "Refunded", dispute_open: "Dispute under review", cancelled: "Cancelled (payment window expired)" };
+    return locale === "en" ? english[status] || status : (STATUS_LABEL[status] || STATUS_LABEL.pending).label;
+  };
+
   const handleUploadSlip = async (orderId: number, file: File) => {
     try {
       await productsApi.uploadSlip(orderId, file);
       fetchOrders();
     } catch {
-      alert("อัปโหลดสลิปไม่สำเร็จ กรุณาลองใหม่");
+      alert(locale === "en" ? "Could not upload the payment slip. Please try again." : "อัปโหลดสลิปไม่สำเร็จ กรุณาลองใหม่");
     }
   };
 
@@ -66,8 +85,8 @@ export default function MyOrdersPage() {
   return (
     <div className="min-h-screen bg-stone-50 pb-20">
       <div className="bg-white border-b border-brand-200 py-10 px-4 text-center">
-        <h1 className="text-3xl font-bold text-brand-950 thai-serif">คำสั่งซื้อของฉัน</h1>
-        <p className="text-brand-950/60 text-xs mt-2">ติดตามสถานะการจอง การชำระเงิน และการจัดส่ง</p>
+        <h1 className="text-3xl font-bold text-brand-950 thai-serif">{locale === "en" ? "My orders" : "คำสั่งซื้อของฉัน"}</h1>
+        <p className="text-brand-950/60 text-xs mt-2">{locale === "en" ? "Track reservations, payments, and delivery." : "ติดตามสถานะการจอง การชำระเงิน และการจัดส่ง"}</p>
       </div>
 
       <div className="max-w-3xl mx-auto px-4 mt-8">
@@ -76,7 +95,7 @@ export default function MyOrdersPage() {
           className="inline-flex items-center gap-1 text-xs font-bold tracking-widest uppercase text-brand-900 hover:text-brand-700 transition-colors mb-6"
         >
           <ChevronLeft size={13} />
-          กลับตลาดผ้าไทย
+          {locale === "en" ? "Back to marketplace" : "กลับตลาดผ้าไทย"}
         </Link>
 
         {loading ? (
@@ -86,7 +105,7 @@ export default function MyOrdersPage() {
         ) : orders.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 text-center border border-amber-100/50 shadow-sm">
             <Package size={48} className="mx-auto text-brand-300 mb-4" />
-            <p className="text-brand-600">คุณยังไม่มีคำสั่งซื้อ</p>
+            <p className="text-brand-600">{locale === "en" ? "You do not have any orders yet." : "คุณยังไม่มีคำสั่งซื้อ"}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -107,21 +126,33 @@ export default function MyOrdersPage() {
                       <div className="min-w-0">
                         <p className="font-semibold text-brand-950 text-sm truncate">{o.product_title}</p>
                         <p className="text-xs text-brand-500">
-                          #{o.id} · จำนวน {o.quantity} ชิ้น · ฿{o.total_thb.toLocaleString()}
+                          #{o.id} · {locale === "en" ? `${o.quantity} item${o.quantity === 1 ? "" : "s"} · $${(o.total_thb / 35).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : `จำนวน ${o.quantity} ชิ้น · ฿${o.total_thb.toLocaleString()}`}
                         </p>
+                        <p className="mt-1 text-[11px] text-brand-500">{locale === "en" ? "Ordered " : "สั่งซื้อเมื่อ "}{formatTime(o.created_at)}</p>
                       </div>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-md font-semibold shrink-0 ${statusInfo.className}`}>
-                      {statusInfo.label}
+                      {statusLabel(o.status)}
                     </span>
                   </div>
+
+                  {o.events?.length > 0 && (
+                    <div className="mt-4 border-t border-amber-100 pt-3">
+                      <p className="text-xs font-bold text-brand-900/70">{locale === "en" ? "Latest updates" : "สถานะล่าสุด"}</p>
+                      <div className="mt-2 space-y-1.5">
+                        {o.events.slice().sort((a: any, b: any) => String(a.created_at).localeCompare(String(b.created_at))).slice(-3).map((event: any) => (
+                          <p key={event.id} className="text-xs text-brand-900/60">{statusLabel(event.to_status)} · {formatTime(event.created_at)}{event.reason ? ` · ${event.reason}` : ""}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {o.status === "pending" && o.reserved_until && (
                     <div className="mt-3">
                       <ReservationCountdown reservedUntil={o.reserved_until} />
                       <label className="mt-3 flex items-center justify-center gap-2 border-2 border-dashed border-amber-300 rounded-xl p-3 cursor-pointer hover:bg-amber-50 transition-colors text-xs text-brand-600">
                         <ImageIcon size={14} />
-                        แนบสลิปโอนเงิน
+                        {locale === "en" ? "Attach payment slip" : "แนบสลิปโอนเงิน"}
                         <input
                           type="file"
                           accept="image/*"
@@ -134,7 +165,7 @@ export default function MyOrdersPage() {
 
                   {o.status === "processing" && (
                     <p className="mt-3 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
-                      แนบสลิปแล้ว รอผู้ขายตรวจสอบและจัดส่งสินค้า
+                      {locale === "en" ? "Payment slip attached. The store will review it and prepare shipment." : "แนบสลิปแล้ว รอผู้ขายตรวจสอบและจัดส่งสินค้า"}
                       {o.slip_url && (
                         <>
                           {" "}
@@ -144,7 +175,7 @@ export default function MyOrdersPage() {
                             rel="noopener noreferrer"
                             className="underline font-semibold"
                           >
-                            ดูสลิปที่แนบ
+                            {locale === "en" ? "View attachment" : "ดูสลิปที่แนบ"}
                           </a>
                         </>
                       )}
@@ -153,8 +184,8 @@ export default function MyOrdersPage() {
 
                   {o.status === "shipped" && (
                     <p className="mt-3 text-xs text-green-700 bg-green-50 border border-green-200 rounded-xl px-3 py-2">
-                      จัดส่งแล้วโดย {o.courier || "ผู้ให้บริการขนส่ง"}
-                      {o.tracking_number && <> · เลขพัสดุ: <span className="font-mono">{o.tracking_number}</span></>}
+                      {locale === "en" ? `Shipped by ${o.courier || "carrier"}` : `จัดส่งแล้วโดย ${o.courier || "ผู้ให้บริการขนส่ง"}`}
+                      {o.tracking_number && <>{locale === "en" ? " · Tracking: " : " · เลขพัสดุ: "}<span className="font-mono">{o.tracking_number}</span></>}
                     </p>
                   )}
                 </div>

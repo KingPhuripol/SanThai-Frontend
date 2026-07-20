@@ -62,6 +62,7 @@ export const fabricsApi = {
     limit?: number;
     region?: string;
     weave_technique?: string;
+    artisan_id?: number;
   }): Promise<FabricPattern[]> => {
     const { data } = await api.get("/api/fabrics/", { params });
     return data;
@@ -125,6 +126,7 @@ export const productsApi = {
     weave_technique?: string;
     max_price_thb?: number;
     artisan_id?: number;
+    include_inactive?: boolean;
     skip?: number;
     limit?: number;
   }): Promise<Product[]> => {
@@ -134,6 +136,16 @@ export const productsApi = {
 
   get: async (id: number): Promise<Product> => {
     const { data } = await api.get(`/api/products/${id}`);
+    return data;
+  },
+
+  getPassport: async (code: string): Promise<any> => {
+    const { data } = await api.get(`/api/products/passports/${encodeURIComponent(code)}`);
+    return data;
+  },
+
+  getPassportQr: async (code: string): Promise<{ image_data_url: string; url: string }> => {
+    const { data } = await api.get(`/api/products/passports/${encodeURIComponent(code)}/qr`);
     return data;
   },
 
@@ -231,6 +243,16 @@ export const artisanApi = {
     return data;
   },
 
+  listCommunities: async (): Promise<any[]> => {
+    const { data } = await api.get("/api/artisan/communities");
+    return data;
+  },
+
+  getStorefront: async (artisanId: number): Promise<any> => {
+    const { data } = await api.get(`/api/artisan/storefront/${artisanId}`);
+    return data;
+  },
+
   updateOrderStatus: async (orderId: number, updateData: {
     status: string;
     tracking_number?: string;
@@ -253,6 +275,8 @@ export const authApi = {
     province?: string;
     region?: string;
     bio_th?: string;
+    accept_terms: boolean;
+    accept_privacy: boolean;
   }): Promise<Session> => {
     const { data } = await api.post("/api/auth/register", payload);
     return data;
@@ -260,6 +284,26 @@ export const authApi = {
 
   login: async (email: string, password: string): Promise<Session> => {
     const { data } = await api.post("/api/auth/login", { email, password });
+    return data;
+  },
+
+  getStoreTermsStatus: async (): Promise<{ accepted: boolean; version: string; store_status: string; verified: boolean }> => {
+    const { data } = await api.get("/api/auth/store-terms-status");
+    return data;
+  },
+
+  acceptStoreTerms: async (): Promise<{ accepted: boolean; version: string; accepted_at: string }> => {
+    const { data } = await api.post("/api/auth/store-terms-acceptance", { accepted: true });
+    return data;
+  },
+
+  updateProfile: async (payload: {
+    full_name?: string;
+    email?: string;
+    password?: string;
+    community_name?: string;
+  }): Promise<Session> => {
+    const { data } = await api.put("/api/auth/profile", payload);
     return data;
   },
 };
@@ -342,5 +386,41 @@ export const adminApi = {
   }): Promise<any> => {
     const { data } = await api.put(`/api/admin/orders/${orderId}/status`, updateData);
     return data;
+  },
+
+  getPartners: async (status?: string): Promise<any[]> => {
+    const { data } = await api.get("/api/admin/partners", { params: status ? { status } : {} });
+    return data;
+  },
+
+  createPartner: async (payload: any): Promise<any> => {
+    const { data } = await api.post("/api/admin/partners", payload);
+    return data;
+  },
+
+  updatePartner: async (partnerId: number, payload: any): Promise<any> => {
+    const { data } = await api.put(`/api/admin/partners/${partnerId}`, payload);
+    return data;
+  },
+
+  deletePartner: async (partnerId: number): Promise<any> => {
+    const { data } = await api.delete(`/api/admin/partners/${partnerId}`);
+    return data;
+  },
+
+  getFinancialReport: async (days = 30): Promise<any> => {
+    const { data } = await api.get("/api/admin/reports/financial", { params: { days } });
+    return data;
+  },
+
+  getTrafficReport: async (days = 30): Promise<any> => {
+    const { data } = await api.get("/api/admin/reports/traffic", { params: { days } });
+    return data;
+  },
+};
+
+export const analyticsApi = {
+  event: async (payload: { event_name: string; path?: string; product_id?: number; anonymous_id?: string; metadata?: Record<string, unknown> }): Promise<void> => {
+    await api.post("/api/analytics/events", payload);
   },
 };

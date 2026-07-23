@@ -161,24 +161,24 @@ export default function MarketplacePage() {
           </p>
 
           {/* Search bar */}
-          <form onSubmit={handleSearch} className="mt-6 max-w-xl mx-auto">
+          <form onSubmit={handleSearch} className="mt-6 max-w-xl mx-auto px-2 sm:px-0">
             <div className="relative">
               <Search
                 size={18}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-400"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-400 pointer-events-none"
               />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={locale === "en" ? "Search with AI, e.g. ‘a pattern for a wedding’" : "ค้นหาด้วย AI เช่น 'ลายสำหรับงานแต่ง' หรือ 'ผ้าความหมายเรื่องความรัก'"}
-                className="w-full pl-11 pr-20 py-3.5 rounded-full bg-white text-brand-900 text-sm focus:outline-none focus:ring-2 focus:ring-gold-400 placeholder-brand-300"
+                placeholder={locale === "en" ? "Search with AI, e.g. ‘wedding fabric’" : "ค้นหาด้วย AI เช่น 'ลายสำหรับงานแต่ง' หรือ 'ครามธรรมชาติ'"}
+                className="w-full pl-11 pr-24 py-3.5 rounded-full bg-white text-brand-900 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-gold-400 placeholder-brand-300 shadow-md"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={clearSearch}
-                  className="absolute right-16 top-1/2 -translate-y-1/2 text-brand-400 hover:text-brand-600"
+                  className="absolute right-20 top-1/2 -translate-y-1/2 text-brand-400 hover:text-brand-600 p-1"
                 >
                   <X size={16} />
                 </button>
@@ -186,7 +186,7 @@ export default function MarketplacePage() {
               <button
                 type="submit"
                 disabled={searching}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-gold-500 hover:bg-gold-400 text-brand-950 text-sm font-bold px-4 py-1.5 rounded-full transition-colors disabled:opacity-60"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-gold-500 hover:bg-gold-400 text-brand-950 text-xs sm:text-sm font-bold px-3.5 py-2 rounded-full transition-colors disabled:opacity-60 shrink-0"
               >
                 {searching ? "…" : (locale === "en" ? "Search" : "ค้นหา")}
               </button>
@@ -195,12 +195,12 @@ export default function MarketplacePage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
         {/* Filters */}
-        <div className="flex items-center gap-3 mb-6 overflow-x-auto pb-2">
+        <div className="flex items-center gap-2 mb-4 sm:mb-6 overflow-x-auto pb-2 scrollbar-hide -mx-3 px-3 sm:mx-0 sm:px-0">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="shrink-0 flex items-center gap-1.5 text-sm px-3 py-1.5 border border-amber-200 rounded-full text-brand-700 hover:bg-amber-50"
+            className="shrink-0 flex items-center gap-1.5 text-xs sm:text-sm px-3 py-2 border border-amber-200 rounded-full text-brand-700 hover:bg-amber-50 bg-white font-medium"
           >
             <Filter size={14} />
             {locale === "en" ? "Filters" : "ตัวกรอง"}
@@ -212,10 +212,10 @@ export default function MarketplacePage() {
               onClick={() =>
                 setSelectedTechnique(selectedTechnique === t ? "" : t)
               }
-              className={`shrink-0 text-sm px-3 py-1.5 rounded-full border transition-colors ${
+              className={`shrink-0 text-xs sm:text-sm px-3 py-2 rounded-full border transition-colors font-medium ${
                 selectedTechnique === t
-                  ? "bg-brand-900 text-white border-brand-900"
-                  : "border-amber-200 text-brand-600 hover:bg-amber-50"
+                  ? "bg-brand-900 text-white border-brand-900 shadow-sm"
+                  : "border-amber-200 text-brand-600 hover:bg-amber-50 bg-white"
               }`}
             >
               {t}
@@ -226,7 +226,7 @@ export default function MarketplacePage() {
         {/* Price filter */}
         {showFilters && (
           <div className="mb-6 p-4 bg-white rounded-2xl border border-amber-100 shadow-sm">
-            <p className="text-sm font-semibold text-brand-700 mb-3">
+            <p className="text-xs sm:text-sm font-semibold text-brand-700 mb-3">
               {locale === "en" ? "Price range" : "ช่วงราคา"}
             </p>
             <div className="flex flex-wrap gap-2">
@@ -234,9 +234,9 @@ export default function MarketplacePage() {
                 <button
                   key={pr.label}
                   onClick={() => setSelectedMaxPrice(pr.max)}
-                  className={`text-sm px-3 py-1.5 rounded-full border transition-colors ${
+                  className={`text-xs sm:text-sm px-3 py-2 rounded-full border transition-colors ${
                     selectedMaxPrice === pr.max
-                      ? "bg-gold-500 text-brand-950 border-gold-500 font-medium"
+                      ? "bg-gold-500 text-brand-950 border-gold-500 font-medium shadow-sm"
                       : "border-amber-200 text-brand-600 hover:bg-amber-50"
                   }`}
                 >
@@ -249,7 +249,7 @@ export default function MarketplacePage() {
 
         {/* Results header */}
         <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-brand-500">
+          <p className="text-xs sm:text-sm text-brand-500 font-medium">
             {searchResults !== null
               ? (locale === "en" ? `${searchResults.length} results for “${searchQuery}”` : `พบ ${searchResults.length} ผลลัพธ์ สำหรับ "${searchQuery}"`)
               : loading
@@ -260,16 +260,16 @@ export default function MarketplacePage() {
 
         {/* Grid */}
         {loading && !searchResults ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl h-80 animate-pulse border border-amber-50"
+                className="bg-white rounded-2xl h-72 animate-pulse border border-amber-50"
               />
             ))}
           </div>
         ) : searchResults !== null ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
             {searchResults.map((r) => (
               <a
                 key={r.fabric_id}
@@ -280,7 +280,7 @@ export default function MarketplacePage() {
                 }
                 className="group block bg-white rounded-2xl overflow-hidden border border-amber-100 hover:border-gold-400 hover:shadow-lg transition-all"
               >
-                <div className="relative h-48 bg-stone-100">
+                <div className="relative h-40 sm:h-48 bg-stone-100">
                   {r.image_url && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -289,24 +289,24 @@ export default function MarketplacePage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   )}
-                  <div className="absolute bottom-2 right-2 bg-gold-500/90 text-brand-950 text-xs font-bold px-2 py-0.5 rounded-full">
+                  <div className="absolute bottom-2 right-2 bg-gold-500/90 text-brand-950 text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full">
                     {r.relevance_score.toFixed(0)}% {locale === "en" ? "match" : "ตรงกัน"}
                   </div>
                 </div>
-                <div className="p-3">
-                  <h3 className="font-semibold text-brand-900 text-sm">
+                <div className="p-2.5 sm:p-3">
+                  <h3 className="font-semibold text-brand-900 text-xs sm:text-sm line-clamp-1">
                     {pick(r.name_th, r.name_en)}
                   </h3>
-                  <p className="text-xs text-brand-500 mt-0.5">
+                  <p className="text-[10px] sm:text-xs text-brand-500 mt-0.5 line-clamp-1">
                     {r.province} · {r.artisan_name}
                   </p>
                   {(r.cultural_meaning_th) && (
-                    <p className="text-xs text-brand-600 mt-1.5 line-clamp-2 leading-relaxed">
+                    <p className="text-[10px] sm:text-xs text-brand-600 mt-1 line-clamp-1 leading-relaxed">
                       {locale === "en" ? r.cultural_meaning_en || r.cultural_meaning_th : r.cultural_meaning_th}
                     </p>
                   )}
                   {r.price_thb && (
-                    <p className="mt-2 font-bold text-brand-900">
+                    <p className="mt-1.5 font-bold text-brand-900 text-xs sm:text-sm">
                       {locale === "en" && r.price_usd ? `$${r.price_usd.toFixed(0)} USD` : `฿${r.price_thb.toLocaleString()}`}
                     </p>
                   )}
@@ -315,7 +315,7 @@ export default function MarketplacePage() {
             ))}
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
             {products.map((product) => (
               <FabricCard key={product.id} product={product} />
             ))}

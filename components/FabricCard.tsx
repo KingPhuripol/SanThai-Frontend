@@ -66,13 +66,13 @@ export default function FabricCard({ product }: FabricCardProps) {
         </div>
 
         {/* Image container */}
-        <div className="relative h-52 overflow-hidden bg-stone-100 thai-stripe-bg">
+        <div className="relative h-40 sm:h-52 overflow-hidden bg-stone-100 thai-stripe-bg">
           <Image
             src={imageUrl}
             alt={pick(product.title_th, product.title_en)}
             fill
             className="object-cover group-hover:scale-107 transition-transform duration-600"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
           />
 
           {/* Image overlay — subtle Thai pattern on hover */}
@@ -80,14 +80,14 @@ export default function FabricCard({ product }: FabricCardProps) {
 
           {/* Badges */}
           {product.fabric?.usage_rights === "commercial" && (
-            <div className="absolute top-2 right-2 bg-white/92 backdrop-blur-sm text-green-700 text-xs font-medium px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+            <div className="absolute top-2 right-2 bg-white/92 backdrop-blur-sm text-green-700 text-[9px] sm:text-xs font-medium px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
               <BadgeCheck size={10} />
-              {locale === "en" ? "Commercial use" : "ใช้เชิงพาณิชย์ได้"}
+              {locale === "en" ? "Commercial" : "เชิงพาณิชย์"}
             </div>
           )}
 
           {/* SanThai Passport badge with Thai diamond */}
-          <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-brand-900/85 backdrop-blur-sm text-gold-400 text-xs font-medium px-2.5 py-1 rounded-full">
+          <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-brand-900/85 backdrop-blur-sm text-gold-400 text-[9px] sm:text-xs font-medium px-2 py-0.5 sm:py-1 rounded-full">
             <CardDiamond size={8} />
             SanThai Passport
           </div>
@@ -95,7 +95,7 @@ export default function FabricCard({ product }: FabricCardProps) {
           {/* Region top-left chip — jade color */}
           {product.community?.region && (
             <div
-              className="absolute top-2 left-2 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded-full"
+              className="absolute top-2 left-2 backdrop-blur-sm text-white text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full"
               style={{ background: "rgba(26,107,90,0.82)" }}
             >
               {(locale === "en" ? REGION_LABELS_EN[product.community.region] : REGION_LABELS[product.community.region]) ||
@@ -105,7 +105,7 @@ export default function FabricCard({ product }: FabricCardProps) {
         </div>
 
         {/* Card body */}
-        <div className="p-4">
+        <div className="p-3 sm:p-4">
           <h3 className="font-bold text-brand-900 text-sm leading-snug line-clamp-2 thai-serif">
             {pick(product.title_th, product.title_en)}
           </h3>

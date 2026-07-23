@@ -33,7 +33,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-brand-900 selection:bg-brand-300 selection:text-white pb-20 overflow-hidden">
       
       {/* ── HERO BANNER ─────────────────────────────────────────── */}
-      <section className="relative w-full h-[90vh] min-h-[700px] flex items-center pt-10">
+      <section className="relative w-full min-h-[560px] sm:min-h-[700px] flex items-center py-12 sm:py-20">
         {/* Background Image / Overlay */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <div className="absolute inset-0 bg-brand-900/60 z-10" />
@@ -52,31 +52,31 @@ export default function HomePage() {
         </div>
 
         {/* Content Container */}
-        <div className="max-w-[1400px] mx-auto px-6 md:px-12 relative z-20 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 md:px-12 relative z-20 w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           
           {/* Left Side: Typography */}
-          <div className="text-white space-y-6 max-w-xl">
-            <h1 className="text-5xl md:text-6xl lg:text-[72px] font-bold thai-serif leading-[1.1] text-gold-400 drop-shadow-xl tracking-tight">
+          <div className="text-white space-y-4 sm:space-y-6 max-w-xl">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[72px] font-bold thai-serif leading-[1.15] text-gold-400 drop-shadow-xl tracking-tight">
               {locale === "en" ? "Thai Textiles" : "ผ้าไทย"}
               <br />
               <span className="text-white">{locale === "en" ? "Stories of identity" : "เรื่องราวแห่งตัวตน"}</span>
             </h1>
-            <p className="text-lg md:text-xl text-white/80 leading-[1.8] font-light max-w-md">
+            <p className="text-sm sm:text-lg md:text-xl text-white/80 leading-relaxed sm:leading-[1.8] font-light max-w-md">
               {locale === "en" ? "Connect with meaningful beauty" : "เชื่อมโยงคุณสู่ความงดงามที่มีความหมาย"}
-              <br />
+              <br className="hidden sm:inline" />
               {locale === "en" ? "From heritage to your own style" : "จากภูมิปัญญา สู่สไตล์ที่เป็นคุณ"}
             </p>
-            <div className="pt-6 flex flex-wrap gap-4 items-center">
+            <div className="pt-2 sm:pt-6 flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center">
               <Link
                 href="/quiz"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-gold-300 to-gold-500 text-brand-950 font-bold rounded-full hover:scale-105 transition-all shadow-[0_0_30px_rgba(212,175,55,0.3)] group text-sm md:text-base"
+                className="inline-flex items-center justify-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-gold-300 to-gold-500 text-brand-950 font-bold rounded-full hover:scale-105 transition-all shadow-[0_0_30px_rgba(212,175,55,0.3)] group text-sm sm:text-base text-center"
               >
                 {locale === "en" ? "Find your style" : "ค้นหาตัวตนของคุณ"}
                 <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="/fabric-verification"
-                className="inline-flex items-center gap-2.5 px-7 py-4 bg-white/10 hover:bg-white/20 border border-gold-400/40 text-gold-300 font-bold rounded-full transition-all text-sm md:text-base backdrop-blur-sm"
+                className="inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 sm:py-4 bg-white/10 hover:bg-white/20 border border-gold-400/40 text-gold-300 font-bold rounded-full transition-all text-sm sm:text-base backdrop-blur-sm text-center"
               >
                 <ShieldCheck size={18} className="text-gold-400" />
                 {locale === "en" ? "Scan Fabric (AI)" : "สแกนและตรวจสอบผ้า"}

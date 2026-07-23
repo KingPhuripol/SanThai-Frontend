@@ -495,19 +495,19 @@ export default function QuizPage() {
       </div>
 
       {/* ── RIGHT: Question panel ───────────────────────────────── */}
-      <div className="flex flex-col justify-center px-8 md:px-14 lg:px-16 py-16">
+      <div className="flex flex-col justify-center px-4 sm:px-8 md:px-14 lg:px-16 py-6 sm:py-16">
 
         {/* Mobile step dots */}
-        <div className="flex items-center gap-2 mb-10 lg:hidden">
+        <div className="flex items-center gap-2 mb-6 sm:mb-10 lg:hidden">
           {STEPS.map((s, i) => (
             <div
               key={s.id}
-              className={`h-px flex-1 transition-all duration-500 ${
-                i < step ? "bg-amber-500" : i === step ? "bg-stone-900" : "bg-stone-200"
+              className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+                i < step ? "bg-gold-400" : i === step ? "bg-white" : "bg-white/20"
               }`}
             />
           ))}
-          <span className="text-[11px] text-stone-400 ml-2 flex-shrink-0">{step + 1}/{STEPS.length}</span>
+          <span className="text-xs font-bold text-amber-300 ml-2 flex-shrink-0">{step + 1}/{STEPS.length}</span>
         </div>
 
         {/* Step label */}

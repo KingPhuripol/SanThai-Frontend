@@ -72,7 +72,7 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 w-full z-50 bg-brand-950/95 border-b border-gold-400/20 backdrop-blur-md shadow-lg shadow-brand-950/40 transition-all">
-      <div className="max-w-[1400px] mx-auto px-6 md:px-12 flex items-center justify-between h-20">
+      <div className="max-w-[1400px] mx-auto px-3 sm:px-6 md:px-12 flex items-center justify-between h-16 sm:h-20">
         
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">

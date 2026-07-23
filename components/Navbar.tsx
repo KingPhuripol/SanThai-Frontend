@@ -269,6 +269,16 @@ export default function Navbar() {
               {t("login")}
             </Link>
           )}
+
+          <a
+            href="https://line.me/R/ti/p/@956vdrxn"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setOpen(false)}
+            className="flex items-center justify-center gap-2 w-full mt-4 py-2.5 bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-bold rounded-xl transition-all shadow-md"
+          >
+            <span>💬 ติดต่อ LINE OA: @956vdrxn</span>
+          </a>
         </div>
       )}
     </nav>

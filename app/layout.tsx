@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   },
 };
 
+import Footer from "@/components/Footer";
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="th">
@@ -38,6 +40,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Navbar />
           <TrafficTracker />
           <main className="min-h-screen">{children}</main>
+          <Footer />
           <ChatWidget />
         </LanguageProvider>
       </body>

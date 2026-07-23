@@ -113,12 +113,17 @@ export default function FabricVerificationPage() {
   };
 
   const selectFile = (image: File) => {
-    if (!image.type.startsWith("image/")) {
-      setError(locale === "en" ? "Choose a JPG, PNG, or WEBP image." : "กรุณาเลือกไฟล์รูปภาพ JPG, PNG หรือ WEBP");
+    const isSupportedImage =
+      !image.type ||
+      image.type.startsWith("image/") ||
+      /\.(heic|heif|png|jpg|jpeg|webp|gif|bmp)$/i.test(image.name);
+
+    if (!isSupportedImage) {
+      setError(locale === "en" ? "Choose a valid image file." : "กรุณาเลือกไฟล์รูปภาพ JPG, PNG, WEBP หรือ HEIC");
       return;
     }
-    if (image.size > 5 * 1024 * 1024) {
-      setError(locale === "en" ? "Images must be 5 MB or smaller." : "รูปภาพต้องมีขนาดไม่เกิน 5 MB");
+    if (image.size > 25 * 1024 * 1024) {
+      setError(locale === "en" ? "Images must be 25 MB or smaller." : "รูปภาพต้องมีขนาดไม่เกิน 25 MB");
       return;
     }
     stopCamera();
@@ -231,7 +236,7 @@ export default function FabricVerificationPage() {
                   {isScanning && <div className="absolute inset-0 flex flex-col items-center justify-center bg-brand-900/75 text-center text-white"><Loader2 className="animate-spin text-gold-400" size={36} /><p className="mt-4 font-bold">{locale === "en" ? "Analysing with AI" : "กำลังวิเคราะห์ด้วย AI"}</p><p className="mt-1 text-sm text-white/70">{locale === "en" ? "Searching related records in the database" : "กำลังค้นหารายการที่เกี่ยวข้องในฐานข้อมูล"}</p></div>}
                 </div>
                 <canvas ref={canvasRef} className="hidden" />
-                <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={onFileChange} />
+                <input ref={inputRef} type="file" accept="image/*,.heic,.heif,.png,.jpg,.jpeg,.webp" className="hidden" onChange={onFileChange} />
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   {isCameraActive ? (

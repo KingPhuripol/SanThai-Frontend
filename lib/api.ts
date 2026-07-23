@@ -96,7 +96,16 @@ export const fabricsApi = {
       const formData = new FormData();
       formData.append("image", file);
       const { data } = await api.post("/api/fabrics/recognize", formData);
-      if (data && data.vision_analysis) return data;
+      if (
+        data &&
+        data.vision_analysis &&
+        data.vision_analysis.fabric_type_th &&
+        data.vision_analysis.fabric_type_th !== "ไม่สามารถระบุได้" &&
+        !data.vision_analysis.description_th?.includes("Connection error") &&
+        (data.vision_analysis.confidence || 0) > 0
+      ) {
+        return data;
+      }
     } catch (e) {
       console.warn("Backend vision API unreachable, using client-side AI fallback analysis:", e);
     }

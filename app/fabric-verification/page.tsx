@@ -71,6 +71,16 @@ export default function FabricVerificationPage() {
     setResult(null);
     try {
       const res = await fabricsApi.recognize(image);
+      if (
+        !res ||
+        !res.vision_analysis ||
+        !res.vision_analysis.fabric_type_th ||
+        res.vision_analysis.fabric_type_th === "ไม่สามารถระบุได้" ||
+        res.vision_analysis.description_th?.includes("Connection error") ||
+        (res.vision_analysis.confidence || 0) === 0
+      ) {
+        throw new Error("Invalid vision analysis result");
+      }
       setResult(res as RecognitionResult);
     } catch (err: any) {
       setResult({

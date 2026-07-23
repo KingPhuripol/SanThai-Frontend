@@ -447,6 +447,10 @@ export const adminApi = {
 
 export const analyticsApi = {
   event: async (payload: { event_name: string; path?: string; product_id?: number; anonymous_id?: string; metadata?: Record<string, unknown> }): Promise<void> => {
-    await api.post("/api/analytics/events", payload);
+    try {
+      await api.post("/api/analytics/events", payload);
+    } catch {
+      // Ignore background analytics logging errors silently
+    }
   },
 };

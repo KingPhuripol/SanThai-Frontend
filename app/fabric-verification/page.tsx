@@ -122,8 +122,8 @@ export default function FabricVerificationPage() {
       setError(locale === "en" ? "Choose a valid image file." : "กรุณาเลือกไฟล์รูปภาพ JPG, PNG, WEBP หรือ HEIC");
       return;
     }
-    if (image.size > 25 * 1024 * 1024) {
-      setError(locale === "en" ? "Images must be 25 MB or smaller." : "รูปภาพต้องมีขนาดไม่เกิน 25 MB");
+    if (image.size > 15 * 1024 * 1024) {
+      setError(locale === "en" ? "Images must be 15 MB or smaller." : "รูปภาพต้องมีขนาดไม่เกิน 15 MB");
       return;
     }
     stopCamera();
@@ -203,7 +203,7 @@ export default function FabricVerificationPage() {
             <div className="mt-8 rounded-2xl border border-amber-100 bg-white p-5 text-sm text-brand-900/70">
               <p className="font-bold text-brand-900">{locale === "en" ? "Tips for a good scan" : "วิธีถ่ายให้ได้ผลดี"}</p>
               <ol className="mt-3 space-y-2 text-sm leading-6">
-                {locale === "en" ? <><li>1. Use natural light and avoid glare.</li><li>2. Show the pattern and fibres in close-up.</li><li>3. Use a JPG, PNG, or WEBP image up to 5 MB.</li></> : <><li>1. ใช้แสงสว่างธรรมชาติและหลีกเลี่ยงแสงสะท้อน</li><li>2. ให้เห็นลวดลายและเส้นใยในระยะใกล้</li><li>3. ใช้รูป JPG, PNG หรือ WEBP ขนาดไม่เกิน 5 MB</li></>}
+                {locale === "en" ? <><li>1. Use natural light and avoid glare.</li><li>2. Show the pattern and fibres in close-up.</li><li>3. Use a JPG, PNG, WEBP, or HEIC image up to 15 MB.</li></> : <><li>1. ใช้แสงสว่างธรรมชาติและหลีกเลี่ยงแสงสะท้อน</li><li>2. ให้เห็นลวดลายและเส้นใยในระยะใกล้</li><li>3. ใช้รูป JPG, PNG, WEBP หรือ HEIC ขนาดไม่เกิน 15 MB</li></>}
               </ol>
             </div>
           </div>
@@ -230,7 +230,7 @@ export default function FabricVerificationPage() {
                   ) : (
                     <button onClick={() => inputRef.current?.click()} className="flex h-full w-full flex-col items-center justify-center p-6 text-center hover:bg-brand-100/60">
                       <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-gold-600 shadow-sm"><ImagePlus size={26} /></span>
-                      <p className="mt-4 font-bold">{locale === "en" ? "Choose a textile image" : "เลือกรูปผ้าจากอุปกรณ์"}</p><p className="mt-1 text-sm text-brand-900/50">JPG, PNG, WEBP · {locale === "en" ? "up to" : "ไม่เกิน"} 5 MB</p>
+                      <p className="mt-4 font-bold">{locale === "en" ? "Choose a textile image" : "เลือกรูปผ้าจากอุปกรณ์"}</p><p className="mt-1 text-sm text-brand-900/50">JPG, PNG, WEBP, HEIC · {locale === "en" ? "up to" : "ไม่เกิน"} 15 MB</p>
                     </button>
                   )}
                   {isScanning && <div className="absolute inset-0 flex flex-col items-center justify-center bg-brand-900/75 text-center text-white"><Loader2 className="animate-spin text-gold-400" size={36} /><p className="mt-4 font-bold">{locale === "en" ? "Analysing with AI" : "กำลังวิเคราะห์ด้วย AI"}</p><p className="mt-1 text-sm text-white/70">{locale === "en" ? "Searching related records in the database" : "กำลังค้นหารายการที่เกี่ยวข้องในฐานข้อมูล"}</p></div>}

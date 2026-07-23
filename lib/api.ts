@@ -447,8 +447,19 @@ export const adminApi = {
 
 export const analyticsApi = {
   event: async (payload: { event_name: string; path?: string; product_id?: number; anonymous_id?: string; metadata?: Record<string, unknown> }): Promise<void> => {
+    if (typeof window === "undefined") return;
     try {
-      await api.post("/api/analytics/events", payload);
+      const url = `${API_URL}/api/analytics/events`;
+      if (navigator.sendBeacon) {
+        const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+        navigator.sendBeacon(url, blob);
+      } else {
+        fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }).catch(() => undefined);
+      }
     } catch {
       // Ignore background analytics logging errors silently
     }

@@ -170,8 +170,8 @@ function AddProductForm() {
       alert("อัปโหลดได้เฉพาะไฟล์รูปภาพเท่านั้น");
       return;
     }
-    if (selected.some((file) => file.size > 5 * 1024 * 1024)) {
-      alert("รูปภาพแต่ละไฟล์ต้องมีขนาดไม่เกิน 5 MB");
+    if (selected.some((file) => file.size > 10 * 1024 * 1024)) {
+      alert("รูปภาพแต่ละไฟล์ต้องมีขนาดไม่เกิน 10 MB");
       return;
     }
     setImageFiles((current) => {
@@ -245,7 +245,9 @@ function AddProductForm() {
       fd.append("description_th", formData.description.trim());
       fd.append("description_en", formData.descriptionEn.trim());
       
-      imageFiles.forEach((file) => fd.append("images", file));
+      const { compressImages } = await import("@/lib/imageUtils");
+      const compressedFiles = await compressImages(imageFiles);
+      compressedFiles.forEach((file) => fd.append("images", file));
       
       if (editingProductId) {
         await productsApi.update(editingProductId, fd);
@@ -255,9 +257,10 @@ function AddProductForm() {
       localStorage.removeItem("santhai_product_draft");
       alert(publish ? (editingProductId ? "บันทึกและเผยแพร่สินค้าสำเร็จ!" : "เพิ่มสินค้าสำเร็จ!") : "บันทึกเป็นแบบร่างแล้ว");
       router.push("/store/products");
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("เกิดข้อผิดพลาดในการเพิ่มสินค้า");
+      const errorMessage = error.response?.data?.detail || error.message || "เกิดข้อผิดพลาดในการเพิ่มสินค้า";
+      alert(`เกิดข้อผิดพลาดในการเพิ่มสินค้า: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -268,10 +271,10 @@ function AddProductForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7] pt-24 pb-32">
+    <div className="min-h-screen bg-[#F5F5F7] pb-32">
       
       {/* Sticky Header */}
-      <div className="fixed top-20 left-0 w-full bg-white/80 backdrop-blur-md border-b border-brand-200/50 z-40">
+      <div className="sticky top-20 z-40 w-full bg-white border-b border-brand-200/50 shadow-sm">
         <div className="max-w-[1000px] mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/store" className="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-900 hover:bg-brand-100 transition-colors">
@@ -317,7 +320,7 @@ function AddProductForm() {
         </div>
       </div>
 
-      <div className="max-w-[1000px] mx-auto px-4 md:px-8 mt-16 space-y-8">
+      <div className="max-w-[1000px] mx-auto px-4 md:px-8 pt-8 space-y-8">
         
         {/* 1. ข้อมูลพื้นฐาน */}
         <section id="section-1" className="bg-white rounded-[24px] p-6 md:p-8 shadow-sm border border-brand-200/50 scroll-mt-48">
@@ -699,7 +702,7 @@ function AddProductForm() {
           {/* Image Upload Area */}
           <div>
             <label className="block text-sm font-bold text-brand-950 mb-2">รูปภาพสินค้า</label>
-            <p className="text-xs text-brand-900/50 mb-4">อัปโหลดอย่างน้อย 1 รูป สูงสุด 4 รูป (JPG, PNG หรือ WEBP ไฟล์ละไม่เกิน 5 MB)</p>
+            <p className="text-xs text-brand-900/50 mb-4">อัปโหลดอย่างน้อย 1 รูป สูงสุด 4 รูป (JPG, PNG หรือ WEBP ไฟล์ละไม่เกิน 10 MB)</p>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               

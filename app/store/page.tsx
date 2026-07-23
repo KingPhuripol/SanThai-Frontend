@@ -13,7 +13,8 @@ import {
   Plus, 
   ChevronRight,
   Lock,
-  MessageSquare
+  MessageSquare,
+  ShoppingBag
 } from "lucide-react";
 import { getSession, Session } from "@/lib/auth";
 import { useLanguage } from "@/components/LanguageProvider";
@@ -49,13 +50,22 @@ export default function StoreDashboardPage() {
               <p className="text-brand-900/60 text-sm">{locale === "en" ? "Welcome, " : "ยินดีต้อนรับ, "}{session.full_name}</p>
             </div>
           </div>
-          <Link
-            href="/store/products/add"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-brand-900 to-brand-800 text-white px-6 py-3 rounded-full font-bold shadow-lg shadow-brand-900/20 hover:scale-105 transition-transform"
-          >
-            <Plus size={20} className="text-gold-400" />
-            {locale === "en" ? "Add product" : "เพิ่มสินค้าใหม่"}
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/marketplace"
+              className="inline-flex items-center gap-2 bg-white border border-brand-200 text-brand-900 px-5 py-3 rounded-full font-bold shadow-sm hover:bg-brand-50 transition-colors"
+            >
+              <ShoppingBag size={18} className="text-gold-600" />
+              {locale === "en" ? "Browse Marketplace" : "ดูตลาดผ้า"}
+            </Link>
+            <Link
+              href="/store/products/add"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-brand-900 to-brand-800 text-white px-6 py-3 rounded-full font-bold shadow-lg shadow-brand-900/20 hover:scale-105 transition-transform"
+            >
+              <Plus size={20} className="text-gold-400" />
+              {locale === "en" ? "Add product" : "เพิ่มสินค้าใหม่"}
+            </Link>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

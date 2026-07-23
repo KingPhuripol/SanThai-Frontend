@@ -110,32 +110,39 @@ export default function ArtisanDashboardPage() {
     <div className="min-h-screen bg-stone-50 pb-20">
       {/* Header */}
       <div className="bg-brand-900 pt-28 pb-14 px-4 text-white">
-        <div className="max-w-5xl mx-auto flex items-end justify-between">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
           <div>
-            <p className="text-amber-300 text-sm">Dashboard ช่างทอ</p>
-            <h1 className="text-2xl font-bold mt-1">{stats.artisan_name}</h1>
-            <p className="text-amber-200 text-sm mt-0.5">{stats.community_name} · {stats.province}</p>
+            <p className="text-amber-300 text-xs font-bold uppercase tracking-wider">Dashboard ช่างทอ</p>
+            <h1 className="text-2xl sm:text-3xl font-bold mt-1 thai-serif">{stats.artisan_name}</h1>
+            <p className="text-amber-200 text-sm mt-0.5">{stats.community_name} · จ.{stats.province}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
+            <Link
+              href="/marketplace"
+              className="inline-flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-xs sm:text-sm font-bold px-3.5 py-2.5 rounded-xl sm:rounded-full transition-colors active:scale-95 shrink-0"
+            >
+              <ShoppingBag size={16} />
+              ดูตลาดผ้า
+            </Link>
             <Link
               href="/artisan/orders"
-              className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-sm font-bold px-4 py-2 rounded-full transition-colors"
+              className="inline-flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-xs sm:text-sm font-bold px-3.5 py-2.5 rounded-xl sm:rounded-full transition-colors active:scale-95 shrink-0"
             >
-              <Package size={15} />
+              <Package size={16} />
               จัดการออเดอร์
             </Link>
             <Link
-              href="/artisan/upload"
-              className="flex items-center gap-1.5 bg-gold-500 hover:bg-gold-400 text-brand-950 text-sm font-bold px-4 py-2 rounded-full transition-colors"
+              href="/store/products/add"
+              className="inline-flex items-center gap-1.5 bg-gold-400 hover:bg-gold-300 text-brand-950 text-xs sm:text-sm font-bold px-3.5 py-2.5 rounded-xl sm:rounded-full transition-colors active:scale-95 shrink-0"
             >
-              <Plus size={15} />
+              <Plus size={16} />
               ลงผ้าใหม่
             </Link>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white/80 text-sm font-bold px-4 py-2 rounded-full transition-colors"
+              className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white/80 text-xs sm:text-sm font-bold px-3.5 py-2.5 rounded-xl sm:rounded-full transition-colors active:scale-95 shrink-0"
             >
-              <LogOut size={15} />
+              <LogOut size={16} />
               ออกจากระบบ
             </button>
           </div>
@@ -163,6 +170,21 @@ export default function ArtisanDashboardPage() {
             sub={`ลงทะเบียน ${stats.registered_fabrics} ลาย`}
             icon={<Package size={20} />}
           />
+        </div>
+
+        {/* Quick Navigation Banner for Marketplace */}
+        <div className="mb-6 bg-gradient-to-r from-brand-900 to-brand-850 text-white rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md border border-gold-400/30">
+          <div>
+            <p className="font-bold text-sm sm:text-base thai-serif">🛒 ตลาดผ้าไทย (SanThai Marketplace)</p>
+            <p className="text-xs text-brand-200 mt-0.5">เข้าชมและค้นหารายการสินค้าทั้งหมดในตลาดผ้าได้ทันที</p>
+          </div>
+          <Link
+            href="/marketplace"
+            className="inline-flex items-center gap-1.5 bg-gold-400 text-brand-950 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-gold-300 transition-colors shrink-0 shadow-sm active:scale-95 w-full sm:w-auto justify-center"
+          >
+            <ShoppingBag size={16} />
+            เปิดดูตลาดผ้า
+          </Link>
         </div>
 
         {/* Revenue chart */}

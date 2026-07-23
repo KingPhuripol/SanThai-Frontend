@@ -38,6 +38,7 @@ export default function ManageProductsPage() {
     if(confirm(locale === "en" ? "Delete this product?" : "คุณต้องการลบสินค้านี้ใช่หรือไม่?")) {
       try {
         await productsApi.delete(id);
+        setProducts((prev) => prev.filter((p) => p.id !== id));
         fetchProducts(); // refresh list
       } catch (err) {
         console.error("Failed to delete product:", err);
@@ -87,7 +88,7 @@ export default function ManageProductsPage() {
         {/* Product List */}
         <div className="bg-white rounded-[24px] shadow-sm border border-brand-200/50 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-[640px]">
               <thead>
                 <tr className="bg-brand-50 border-b border-brand-100 text-brand-900/70 text-sm font-bold">
                   <th className="p-4 pl-6">{locale === "en" ? "Product" : "สินค้า"}</th>
@@ -102,13 +103,11 @@ export default function ManageProductsPage() {
                   <tr key={product.id} className="border-b border-brand-100/50 hover:bg-brand-50/50 transition-colors">
                     <td className="p-4 pl-6">
                       <div className="flex items-center gap-4">
-                        {product.images && product.images.length > 0 ? (
-                          <img src={product.images[0]} alt={pick(product.title_th, product.title_en)} className="w-16 h-16 rounded-lg object-cover border border-brand-100" />
-                        ) : (
-                          <div className="w-16 h-16 rounded-lg bg-gray-200 border border-brand-100 flex items-center justify-center">
-                            <span className="text-xs text-gray-500">{locale === "en" ? "No image" : "ไม่มีรูป"}</span>
-                          </div>
-                        )}
+                        <img 
+                          src={(product.images && product.images.length > 0 && product.images[0]) ? product.images[0] : (product.fabric?.image_url || "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_01.jpg")} 
+                          alt={pick(product.title_th, product.title_en)} 
+                          className="w-16 h-16 rounded-lg object-cover border border-brand-100 shrink-0" 
+                        />
                         <span className="font-bold text-brand-900">{pick(product.title_th, product.title_en)}</span>
                       </div>
                     </td>

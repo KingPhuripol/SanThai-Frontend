@@ -60,7 +60,59 @@ export default function CommunityPage() {
 
       <section className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-7"><div className="flex flex-wrap gap-2">{REGIONS.map((item) => <button key={item.id} onClick={() => setRegion(item.id)} className={`rounded-full px-4 py-2 text-sm font-bold transition ${region === item.id ? item.tone : "bg-white/10 text-white/70 hover:bg-white/20"}`}>{locale === "en" ? item.en : item.th}</button>)}</div><ThailandMap communities={communities} region={region} setRegion={setRegion} locale={locale} /></section>
 
-      <section className="mt-10"><div className="mb-5 flex items-center justify-between"><h2 className="text-2xl font-bold thai-serif">{locale === "en" ? "Stores in " : "ร้านค้าใน"}{region === "all" ? (locale === "en" ? "Thailand" : "ทุกภูมิภาค") : (() => { const selected = REGIONS.find((item) => item.id === region); return locale === "en" ? selected?.en : selected?.th; })()}</h2><Link href="/marketplace" className="inline-flex items-center gap-1 text-sm font-bold text-gold-300">{locale === "en" ? "Browse marketplace" : "ดูตลาดผ้า"} <ArrowRight size={15} /></Link></div>{loading ? <div className="grid grid-cols-1 gap-5 md:grid-cols-3">{[1, 2, 3].map((key) => <div key={key} className="h-72 animate-pulse rounded-3xl bg-white/10" />)}</div> : visible.length === 0 ? <div className="rounded-3xl border border-dashed border-white/20 p-12 text-center text-white/65">{locale === "en" ? "No verified stores are available in this region yet." : "ยังไม่มีร้านค้าที่ผ่านการยืนยันในภูมิภาคนี้"}</div> : <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">{visible.flatMap((community) => community.stores.map((store: any) => <article key={store.id} className="overflow-hidden rounded-3xl bg-[#FAF6ED] text-brand-900 shadow-xl"><div className="relative h-44"><Image src={store.image_url || FALLBACK_IMAGE} alt={store.name} fill className="object-cover" /><div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent p-4 pt-12 text-sm font-bold text-white"><MapPin className="inline" size={14} /> {locale === "en" ? community.province_en || community.province : `จ.${community.province}`}</div></div><div className="p-5"><p className="text-lg font-bold thai-serif">{store.name}</p><p className="mt-2 line-clamp-2 min-h-10 text-sm text-brand-900/60">{locale === "en" ? store.bio_en || store.bio_th || `Thai textile store from ${community.name_en || community.name}` : store.bio_th || `ร้านผ้าไทยจาก${community.name}`}</p><div className="mt-4 flex items-center gap-4 text-xs text-brand-900/55"><span className="inline-flex items-center gap-1"><Store size={14} />{store.product_count} {locale === "en" ? "products" : "สินค้า"}</span><span className="inline-flex items-center gap-1"><Users size={14} />{locale === "en" ? "Verified" : "ร้านค้ายืนยันแล้ว"}</span></div><Link href={`/storefront/${store.id}`} className="mt-5 flex items-center justify-center gap-2 rounded-xl bg-brand-900 py-3 text-sm font-bold text-white hover:bg-brand-800">{t("viewStore")} <ArrowRight size={15} /></Link></div></article>))}</div>}</section>
+      <section className="mt-10">
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-2xl font-bold thai-serif">
+            {locale === "en" ? "Verified Stores in " : "ร้านค้ายืนยันแล้วใน"}
+            {region === "all" ? (locale === "en" ? "Thailand" : "ทุกภูมิภาค") : (() => { const selected = REGIONS.find((item) => item.id === region); return locale === "en" ? selected?.en : selected?.th; })()}
+          </h2>
+          <Link href="/marketplace" className="inline-flex items-center gap-1 text-sm font-bold text-gold-300">
+            {locale === "en" ? "Browse marketplace" : "ดูตลาดผ้า"} <ArrowRight size={15} />
+          </Link>
+        </div>
+        {loading ? (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+            {[1, 2, 3].map((key) => <div key={key} className="h-72 animate-pulse rounded-3xl bg-white/10" />)}
+          </div>
+        ) : visible.length === 0 ? (
+          <div className="rounded-3xl border border-dashed border-white/20 p-12 text-center text-white/65">
+            {locale === "en" ? "No verified stores available in this region yet." : "ยังไม่มีร้านค้าที่ผ่านการยืนยันในภูมิภาคนี้"}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {visible.flatMap((community) =>
+              (community.stores || []).map((store: any) => (
+                <article key={store.id} className="overflow-hidden rounded-3xl bg-[#FAF6ED] text-brand-900 shadow-xl transition hover:-translate-y-1 flex flex-col justify-between">
+                  <div className="relative h-44">
+                    <Image src={store.image_url || FALLBACK_IMAGE} alt={store.name} fill className="object-cover" />
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent p-4 pt-12 text-sm font-bold text-white">
+                      <MapPin className="inline mr-1" size={14} />
+                      {locale === "en" ? community.province_en || community.province : `จ.${community.province}`}
+                    </div>
+                  </div>
+                  <div className="p-5 flex flex-col justify-between flex-1">
+                    <div>
+                      <p className="text-lg font-bold thai-serif">{store.name}</p>
+                      <p className="mt-2 line-clamp-2 min-h-10 text-sm text-brand-900/60">
+                        {locale === "en" ? store.bio_en || store.bio_th || `Thai textile store from ${community.name}` : store.bio_th || `ร้านผ้าไทยจาก${community.name}`}
+                      </p>
+                    </div>
+                    <div className="mt-5 pt-3 border-t border-brand-900/10">
+                      <div className="flex items-center gap-4 text-xs text-brand-900/55 mb-4">
+                        <span className="inline-flex items-center gap-1"><Store size={14} />{store.product_count || 0} {locale === "en" ? "products" : "สินค้า"}</span>
+                        <span className="inline-flex items-center gap-1 text-emerald-700 font-bold"><Users size={14} />{locale === "en" ? "Verified" : "ร้านค้ายืนยันแล้ว"}</span>
+                      </div>
+                      <Link href={`/storefront/${store.id}`} className="flex items-center justify-center gap-2 rounded-xl bg-brand-900 py-3 text-sm font-bold text-white hover:bg-brand-800 transition-colors">
+                        {t("viewStore")} <ArrowRight size={15} />
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        )}
+      </section>
     </div>
   </main>;
 }

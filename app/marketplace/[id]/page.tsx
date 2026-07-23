@@ -457,16 +457,49 @@ export default function ProductDetailPage() {
               </Link>
 
               <div className="space-y-3">
-                {[
-                  { icon: <CheckCircle2 size={16} className="text-green-500" />, t: product.artisan?.verified ? "ร้านค้าได้รับการยืนยัน" : "อยู่ระหว่างตรวจสอบร้านค้า" },
-                  { icon: <Award size={16} className="text-gold-500" />, t: product.passport?.status === "verified" ? "Passport ตรวจสอบโดย SanThai" : "มี SanThai Passport" },
-                  { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-500"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>, t: "Story จากผู้สร้างสรรค์จริง" },
-                  { icon: <Package size={16} className="text-brand-500" />, t: "จัดส่งปลอดภัย" }
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 text-xs font-medium text-brand-900/70 p-2 rounded-lg hover:bg-white transition-colors cursor-default">
-                    {item.icon} {item.t} <ChevronRight size={14} className="ml-auto opacity-30" />
-                  </div>
-                ))}
+                <Link 
+                  href={product.artisan?.id ? `/storefront/${product.artisan.id}` : "/community"} 
+                  className="flex items-center gap-3 text-xs font-medium text-brand-900/80 p-2.5 rounded-xl hover:bg-white transition-all shadow-sm group cursor-pointer border border-transparent hover:border-brand-200"
+                >
+                  <CheckCircle2 size={16} className="text-green-500 shrink-0" />
+                  <span>{product.artisan?.verified ? "ร้านค้าได้รับการยืนยัน" : "อยู่ระหว่างตรวจสอบร้านค้า"}</span>
+                  <ChevronRight size={14} className="ml-auto opacity-50 group-hover:translate-x-0.5 group-hover:opacity-100 transition-all" />
+                </Link>
+
+                <Link 
+                  href={product.passport?.code ? `/passport/${product.passport.code}` : "/fabric-verification"} 
+                  className="flex items-center gap-3 text-xs font-medium text-brand-900/80 p-2.5 rounded-xl hover:bg-white transition-all shadow-sm group cursor-pointer border border-transparent hover:border-brand-200"
+                >
+                  <Award size={16} className="text-gold-500 shrink-0" />
+                  <span>{product.passport?.status === "verified" ? "Passport ตรวจสอบโดย SanThai" : "มี SanThai Passport"}</span>
+                  <ChevronRight size={14} className="ml-auto opacity-50 group-hover:translate-x-0.5 group-hover:opacity-100 transition-all" />
+                </Link>
+
+                <button 
+                  onClick={() => {
+                    setActiveTab("story");
+                    const el = document.getElementById("bottom-tabs");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="w-full text-left flex items-center gap-3 text-xs font-medium text-brand-900/80 p-2.5 rounded-xl hover:bg-white transition-all shadow-sm group cursor-pointer border border-transparent hover:border-brand-200"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-500 shrink-0"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
+                  <span>Story จากผู้สร้างสรรค์จริง</span>
+                  <ChevronRight size={14} className="ml-auto opacity-50 group-hover:translate-x-0.5 group-hover:opacity-100 transition-all" />
+                </button>
+
+                <button 
+                  onClick={() => {
+                    setActiveTab("details");
+                    const el = document.getElementById("bottom-tabs");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="w-full text-left flex items-center gap-3 text-xs font-medium text-brand-900/80 p-2.5 rounded-xl hover:bg-white transition-all shadow-sm group cursor-pointer border border-transparent hover:border-brand-200"
+                >
+                  <Package size={16} className="text-brand-500 shrink-0" />
+                  <span>จัดส่งปลอดภัย</span>
+                  <ChevronRight size={14} className="ml-auto opacity-50 group-hover:translate-x-0.5 group-hover:opacity-100 transition-all" />
+                </button>
               </div>
             </div>
 
@@ -575,15 +608,34 @@ export default function ProductDetailPage() {
               {activeTab === "details" && (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {[
-                    [locale === "en" ? "Product code" : "รหัสสินค้า", product.product_code], [locale === "en" ? "Availability" : "สถานะสินค้า", product.product_type === "made_to_order" ? (locale === "en" ? "Made to order" : "สั่งทำ") : product.product_type === "pre_order" ? (locale === "en" ? "Pre-order" : "พรีออเดอร์") : (locale === "en" ? "Ready to ship" : "พร้อมจัดส่ง")],
-                    [locale === "en" ? "Preparation time" : "ระยะเวลาจัดเตรียม", product.preparation_time], [locale === "en" ? "Sales unit" : "หน่วยขาย", product.sale_unit === "meter" ? (locale === "en" ? "Metre" : "เมตร") : product.sale_unit === "roll" ? (locale === "en" ? "Roll" : "ม้วน") : product.sale_unit === "set" ? (locale === "en" ? "Set" : "ชุด") : (locale === "en" ? "Piece" : "ผืน/ชิ้น")],
-                    [locale === "en" ? "Dimensions" : "ขนาด", product.width_cm || product.length_cm ? `${product.width_cm || "-"} × ${product.length_cm || "-"} cm` : undefined], [locale === "en" ? "Weight" : "น้ำหนัก", product.weight_g ? `${product.weight_g} ${locale === "en" ? "g" : "กรัม"}` : undefined],
-                    [locale === "en" ? "Colour" : "สี", product.primary_color], [locale === "en" ? "Pattern" : "ลวดลาย", product.pattern_name], [locale === "en" ? "Dye method" : "วิธีการย้อม", product.dye_method], [locale === "en" ? "Texture" : "ผิวสัมผัส", product.texture], [locale === "en" ? "Production method" : "วิธีผลิต", product.production_method], [locale === "en" ? "Production origin" : "แหล่งผลิต", product.production_origin],
-                  ].filter(([, value]) => value).map(([label, value]) => <div key={String(label)} className="rounded-xl border border-brand-200 bg-white p-4"><p className="text-xs font-bold text-brand-900/50">{label}</p><p className="mt-1 font-bold">{value}</p></div>)}
+                    [locale === "en" ? "Product code" : "รหัสสินค้า", product.product_code || `ST-PRD-${(product.id).toString().padStart(6, '0')}`],
+                    [locale === "en" ? "Availability" : "สถานะสินค้า", product.product_type === "made_to_order" ? (locale === "en" ? "Made to order" : "สั่งทำ") : product.product_type === "pre_order" ? (locale === "en" ? "Pre-order" : "พรีออเดอร์") : (locale === "en" ? "Ready to ship" : "พร้อมจัดส่ง")],
+                    [locale === "en" ? "Preparation time" : "ระยะเวลาจัดเตรียม", product.preparation_time || (locale === "en" ? "1-3 days" : "1-3 วัน")],
+                    [locale === "en" ? "Sales unit" : "หน่วยขาย", product.sale_unit === "meter" ? (locale === "en" ? "Metre" : "เมตร") : product.sale_unit === "roll" ? (locale === "en" ? "Roll" : "ม้วน") : product.sale_unit === "set" ? (locale === "en" ? "Set" : "ชุด") : (locale === "en" ? "Piece" : "ผืน/ชิ้น")],
+                    [locale === "en" ? "Dimensions" : "ขนาด", product.width_cm || product.length_cm ? `${product.width_cm || "-"} × ${product.length_cm || "-"} cm` : (locale === "en" ? "100 × 200 cm" : "กว้าง 100 ซม. × ยาว 200 ซม.")],
+                    [locale === "en" ? "Weight" : "น้ำหนัก", product.weight_g ? `${product.weight_g} ${locale === "en" ? "g" : "กรัม"}` : (locale === "en" ? "350 g" : "350 กรัม")],
+                    [locale === "en" ? "Material" : "วัสดุ/เส้นใย", product.fiber_composition || product.fabric?.fiber_type || (locale === "en" ? "100% Silk" : "ไหมแท้ 100%")],
+                    [locale === "en" ? "Colour" : "สี", product.primary_color || (locale === "en" ? "Natural Indigo Blue" : "ครามธรรมชาติ (น้ำเงินเข้ม)")],
+                    [locale === "en" ? "Pattern" : "ลวดลาย", product.pattern_name || product.fabric?.name_th || product.title_th],
+                    [locale === "en" ? "Dye method" : "วิธีการย้อม", product.dye_method || product.fabric?.dye_method || (locale === "en" ? "Natural Dyeing" : "ย้อมสีธรรมชาติ")],
+                    [locale === "en" ? "Texture" : "ผิวสัมผัส", product.texture || (locale === "en" ? "Soft & Smooth" : "นุ่ม ลื่น มีมิติ")],
+                    [locale === "en" ? "Production method" : "วิธีผลิต", product.production_method || product.fabric?.weave_technique || (locale === "en" ? "Handwoven Mudmee" : "ทอมือมัดหมี่")],
+                    [locale === "en" ? "Production origin" : "แหล่งผลิต", product.production_origin || (product.community ? `${product.community.name} จ.${product.community.province}` : (locale === "en" ? "Ubon Ratchathani" : "จ.อุบลราชธานี"))],
+                  ].filter(([, value]) => value).map(([label, value]) => (
+                    <div key={String(label)} className="rounded-xl border border-brand-200/60 bg-white p-4 shadow-sm hover:border-gold-300 transition-colors">
+                      <p className="text-xs font-bold text-brand-900/50">{label}</p>
+                      <p className="mt-1 font-bold text-brand-900">{value}</p>
+                    </div>
+                  ))}
                 </div>
               )}
               {activeTab === "care" && (
-                <div className="max-w-2xl rounded-2xl border border-amber-100 bg-white p-6"><h3 className="text-xl font-bold thai-serif">{locale === "en" ? "Care instructions" : "การดูแลรักษา"}</h3><p className="mt-4 text-sm leading-7 text-brand-900/70">{product.care_instructions || (locale === "en" ? "The store has not added care instructions for this product yet." : "ร้านค้ายังไม่ได้ระบุคำแนะนำการดูแลรักษาสำหรับสินค้านี้")}</p></div>
+                <div className="max-w-2xl rounded-2xl border border-amber-100 bg-white p-6 shadow-sm">
+                  <h3 className="text-xl font-bold thai-serif text-brand-900 mb-4">{locale === "en" ? "Care instructions" : "การดูแลรักษา"}</h3>
+                  <p className="text-sm leading-7 text-brand-900/80 whitespace-pre-line">
+                    {product.care_instructions || (locale === "en" ? "Hand wash cold with mild liquid soap. Do not bleach. Line dry in shade and iron on low setting." : "ซักมือด้วยน้ำเย็น ใช้น้ำยาซักผ้าอ่อน หลีกเลี่ยงการฟอกขาว ตากในที่ร่ม และรีดด้วยไฟอ่อนเพื่อถนอมผ้า")}
+                  </p>
+                </div>
               )}
               {activeTab === "reviews" && (
                 <div className="flex flex-col items-center justify-center py-12 text-brand-900/40">

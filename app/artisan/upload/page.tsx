@@ -103,6 +103,9 @@ export default function ArtisanUploadPage() {
   };
 
   const createListing = async (fabricId: number) => {
+    const { compressImages } = await import("@/lib/imageUtils");
+    const compressedImages = await compressImages(form.images);
+
     const pfd = new FormData();
     pfd.append("fabric_id", String(fabricId));
     pfd.append("title_th", form.name_th);
@@ -110,7 +113,7 @@ export default function ArtisanUploadPage() {
     pfd.append("stock", form.stock || "1");
     pfd.append("category", "fabric_roll");
     if (form.description_th) pfd.append("description_th", form.description_th);
-    form.images.forEach((img) => pfd.append("images", img));
+    compressedImages.forEach((img) => pfd.append("images", img));
 
     const productRes = await productsApi.upload(pfd);
     setCreatedProductId(productRes.id);
@@ -124,8 +127,9 @@ export default function ArtisanUploadPage() {
     setError("");
     try {
       await createListing(partialFabricId);
-    } catch {
-      setError("สร้างรายการขายไม่สำเร็จอีกครั้ง กรุณาลองใหม่");
+    } catch (err: any) {
+      const detail = err?.response?.data?.detail;
+      setError(detail ? `สร้างรายการขายไม่สำเร็จ: ${detail}` : "สร้างรายการขายไม่สำเร็จอีกครั้ง กรุณาลองใหม่");
     } finally {
       setSubmitting(false);
     }
@@ -137,6 +141,9 @@ export default function ArtisanUploadPage() {
 
     let fabricId: number;
     try {
+      const { compressImages } = await import("@/lib/imageUtils");
+      const compressedImages = await compressImages(form.images);
+
       const fd = new FormData();
       fd.append("name_th", form.name_th);
       fd.append("name_en", form.name_en);
@@ -146,21 +153,25 @@ export default function ArtisanUploadPage() {
       fd.append("cultural_meaning_th", form.cultural_meaning_th);
       fd.append("story_th", form.story_th);
       fd.append("usage_rights", form.usage_rights);
-      form.images.forEach((img) => fd.append("images", img));
+      compressedImages.forEach((img) => fd.append("images", img));
       const fabricRes = await fabricsApi.upload(fd);
       fabricId = fabricRes.id;
-    } catch {
-      setError("อัปโหลดผ้าไม่สำเร็จ กรุณาลองใหม่");
+    } catch (err: any) {
+      const detail = err?.response?.data?.detail;
+      setError(detail ? `อัปโหลดผ้าไม่สำเร็จ: ${detail}` : "อัปโหลดผ้าไม่สำเร็จ กรุณาลองใหม่");
       setSubmitting(false);
       return;
     }
 
     try {
       await createListing(fabricId);
-    } catch {
+    } catch (err: any) {
       setPartialFabricId(fabricId);
+      const detail = err?.response?.data?.detail;
       setError(
-        "สร้างลายผ้าสำเร็จ แต่สร้างรายการขายไม่สำเร็จ — กดปุ่มด้านล่างเพื่อลองสร้างรายการขายอีกครั้ง (ไม่ต้องอัปโหลดผ้าใหม่)"
+        detail
+          ? `สร้างลายผ้าสำเร็จ แต่สร้างรายการขายไม่สำเร็จ: ${detail}`
+          : "สร้างลายผ้าสำเร็จ แต่สร้างรายการขายไม่สำเร็จ — กดปุ่มด้านล่างเพื่อลองสร้างรายการขายอีกครั้ง (ไม่ต้องอัปโหลดผ้าใหม่)"
       );
     } finally {
       setSubmitting(false);

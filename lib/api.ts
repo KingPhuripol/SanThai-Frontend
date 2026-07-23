@@ -81,9 +81,7 @@ export const fabricsApi = {
   upload: async (
     formData: FormData,
   ): Promise<{ id: number; name_th: string; message: string; ai_processing: boolean }> => {
-    const { data } = await api.post("/api/fabrics/upload", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const { data } = await api.post("/api/fabrics/upload", formData);
     return data;
   },
 
@@ -96,9 +94,7 @@ export const fabricsApi = {
   }> => {
     const formData = new FormData();
     formData.append("image", file);
-    const { data } = await api.post("/api/fabrics/recognize", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const { data } = await api.post("/api/fabrics/recognize", formData);
     return data;
   },
 
@@ -106,9 +102,7 @@ export const fabricsApi = {
     fabricId: number,
     formData: FormData,
   ): Promise<{ id: number; message: string }> => {
-    const { data } = await api.put(`/api/fabrics/${fabricId}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const { data } = await api.put(`/api/fabrics/${fabricId}`, formData);
     return data;
   },
 
@@ -164,9 +158,7 @@ export const productsApi = {
   uploadSlip: async (orderId: number, file: File): Promise<any> => {
     const formData = new FormData();
     formData.append("slip", file);
-    const res = await api.post(`/api/products/orders/${orderId}/slip`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const res = await api.post(`/api/products/orders/${orderId}/slip`, formData);
     return res.data;
   },
   
@@ -178,9 +170,7 @@ export const productsApi = {
   upload: async (
     formData: FormData,
   ): Promise<{ id: number; title_th: string; message: string }> => {
-    const { data } = await api.post("/api/products/upload", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const { data } = await api.post("/api/products/upload", formData);
     return data;
   },
 
@@ -188,9 +178,7 @@ export const productsApi = {
     productId: number,
     formData: FormData,
   ): Promise<{ id: number; message: string }> => {
-    const { data } = await api.put(`/api/products/${productId}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const { data } = await api.put(`/api/products/${productId}`, formData);
     return data;
   },
 

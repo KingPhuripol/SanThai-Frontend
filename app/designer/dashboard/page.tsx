@@ -97,7 +97,7 @@ export default function DesignerDashboardPage() {
               <p className="text-xs opacity-80 max-w-[200px]">นำลายผ้าจากชุมชนมาต่อยอดเป็นแฟชั่นร่วมสมัย</p>
             </div>
             <Link
-              href="/designer/upload"
+              href="/store/products/add"
               className="bg-brand-950 text-gold-400 p-3 rounded-full hover:bg-brand-900 transition-transform hover:scale-105"
             >
               <Plus size={24} />

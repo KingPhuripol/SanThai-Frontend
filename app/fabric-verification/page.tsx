@@ -91,8 +91,14 @@ export default function FabricVerificationPage() {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setFile(image);
     setPreviewUrl(URL.createObjectURL(image));
-    setResult(null);
     setError(null);
+    analyze(image);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const droppedFile = e.dataTransfer.files?.[0];
+    if (droppedFile) selectFile(droppedFile);
   };
 
   const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -173,7 +179,11 @@ export default function FabricVerificationPage() {
 
             {!result ? (
               <>
-                <div className="relative mt-6 aspect-[16/10] overflow-hidden rounded-2xl border-2 border-dashed border-brand-200 bg-brand-50">
+                <div
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={handleDrop}
+                  className="relative mt-6 aspect-[16/10] overflow-hidden rounded-2xl border-2 border-dashed border-brand-200 bg-brand-50"
+                >
                   {isCameraActive ? (
                     <><video ref={videoRef} autoPlay playsInline className="h-full w-full object-cover" /><div className="pointer-events-none absolute inset-7 rounded-2xl border-2 border-gold-400/80" /></>
                   ) : previewUrl ? (

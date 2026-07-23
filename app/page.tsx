@@ -66,13 +66,20 @@ export default function HomePage() {
               <br />
               {locale === "en" ? "From heritage to your own style" : "จากภูมิปัญญา สู่สไตล์ที่เป็นคุณ"}
             </p>
-            <div className="pt-6">
+            <div className="pt-6 flex flex-wrap gap-4 items-center">
               <Link
                 href="/quiz"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-gold-300 to-gold-500 text-brand-950 font-bold rounded-full hover:scale-105 transition-all shadow-[0_0_30px_rgba(212,175,55,0.3)] group"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-gold-300 to-gold-500 text-brand-950 font-bold rounded-full hover:scale-105 transition-all shadow-[0_0_30px_rgba(212,175,55,0.3)] group text-sm md:text-base"
               >
                 {locale === "en" ? "Find your style" : "ค้นหาตัวตนของคุณ"}
                 <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
+                href="/fabric-verification"
+                className="inline-flex items-center gap-2.5 px-7 py-4 bg-white/10 hover:bg-white/20 border border-gold-400/40 text-gold-300 font-bold rounded-full transition-all text-sm md:text-base backdrop-blur-sm"
+              >
+                <ShieldCheck size={18} className="text-gold-400" />
+                {locale === "en" ? "Scan Fabric (AI)" : "สแกนและตรวจสอบผ้า"}
               </Link>
             </div>
           </div>
@@ -114,7 +121,7 @@ export default function HomePage() {
 
       {/* ── FEATURES BAR ────────────────────────────────────────── */}
       <section className="relative z-30 max-w-[1400px] mx-auto px-6 -mt-8">
-        <div className="flex flex-wrap justify-center md:justify-between items-center gap-6 lg:gap-2 py-6 border-b border-white/10">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 py-6 border-b border-white/10">
           {[
             { icon: <Sparkles className="text-gold-400" size={24} strokeWidth={1.5} />, title: locale === "en" ? "Thai heritage" : "ภูมิปัญญาไทย", subtitle: locale === "en" ? "Passed down through generations" : "สืบสานจากรุ่นสู่รุ่น" },
             { icon: <div className="w-6 h-6 rounded-sm border border-gold-400 grid grid-cols-2 gap-[2px] p-[2px]"><div className="bg-gold-400/50 rounded-[1px]" /><div className="bg-gold-400 rounded-[1px]" /><div className="bg-gold-400 rounded-[1px]" /><div className="bg-gold-400/50 rounded-[1px]" /></div>, title: locale === "en" ? "Living craft" : "งานศิลป์ที่มีชีวิต", subtitle: locale === "en" ? "Woven with care and meaning" : "ทอด้วยใจ ใส่ด้วยความหมาย" },
@@ -128,9 +135,33 @@ export default function HomePage() {
                 <h3 className="text-white text-[13px] font-bold">{feat.title}</h3>
                 <p className="text-white/50 text-[10px]">{feat.subtitle}</p>
               </div>
-              {i < 4 && <div className="hidden lg:block w-px h-6 bg-white/10 ml-8" />}
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── AI FABRIC VERIFICATION BANNER ────────────────────────── */}
+      <section className="max-w-[1400px] mx-auto px-6 mt-12">
+        <div className="bg-gradient-to-r from-brand-950 via-brand-850 to-brand-900 rounded-[32px] p-8 md:p-12 border border-gold-400/30 shadow-2xl relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8">
+          <div className="max-w-2xl text-left">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1 bg-gold-400/20 text-gold-300 text-xs font-bold rounded-full border border-gold-400/30 mb-4">
+              <ShieldCheck size={14} /> SANTHAI AI FABRIC SCANNER
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-white thai-serif leading-tight">
+              {locale === "en" ? "Check and identify Thai textiles with AI" : "สแกนและตรวจสอบลักษณะผ้าไทยด้วยระบบ AI"}
+            </h2>
+            <p className="mt-3 text-sm md:text-base text-brand-200 leading-relaxed">
+              {locale === "en" ? "Upload or take a photo of any textile. AI instantly analyzes weave technique, pattern names, fiber types, and matches related records in the database." : "ถ่ายภาพหรืออัปโหลดรูปผ้าไทย ระบบ AI จะวิเคราะห์ประเภทผ้า ลวดลาย เทคนิคการทอ เส้นใย พร้อมค้นหารายการที่เกี่ยวข้องในฐานข้อมูลทันที"}
+            </p>
+          </div>
+          <Link
+            href="/fabric-verification"
+            className="inline-flex shrink-0 items-center justify-center gap-3 px-8 py-4 bg-gold-400 text-brand-950 font-bold rounded-full hover:bg-gold-300 transition-all shadow-[0_0_25px_rgba(212,175,55,0.3)] text-base"
+          >
+            <ShieldCheck size={20} />
+            {locale === "en" ? "Start Fabric Scan" : "เริ่มสแกนผ้าเลย"}
+            <ArrowRight size={18} />
+          </Link>
         </div>
       </section>
 
@@ -180,10 +211,10 @@ export default function HomePage() {
       </section>
 
       {/* ── FOOTER FEATURES ─────────────────────────────────────── */}
-      <section className="max-w-[1400px] mx-auto px-4 mt-12">
-        <div className="flex flex-wrap justify-between items-center py-6 border-t border-white/10 text-white/80 gap-6 lg:px-10">
+      <section className="max-w-[1400px] mx-auto px-4 mt-12 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 py-6 border-t border-white/10 text-white/80 gap-6 lg:px-10">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-gold-400">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-gold-400 shrink-0">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             </div>
             <div>
@@ -193,7 +224,7 @@ export default function HomePage() {
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-gold-400">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-gold-400 shrink-0">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
             </div>
             <div>
@@ -203,7 +234,7 @@ export default function HomePage() {
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-gold-400">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-gold-400 shrink-0">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
             </div>
             <div>
@@ -213,7 +244,7 @@ export default function HomePage() {
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-gold-400">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-gold-400 shrink-0">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M15.05 5A5 5 0 0 1 19 8.95M15.05 1A9 9 0 0 1 23 8.94m-1 7.98v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
             </div>
             <div>
@@ -222,8 +253,8 @@ export default function HomePage() {
             </div>
           </div>
           
-          <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/10">
-            <div className="w-6 h-6 rounded-full bg-[#00B900] flex items-center justify-center text-white font-bold text-[8px]">
+          <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/10 shrink-0 col-span-2 sm:col-span-1 justify-center sm:justify-start">
+            <div className="w-6 h-6 rounded-full bg-[#00B900] flex items-center justify-center text-white font-bold text-[8px] shrink-0">
               LINE
             </div>
             <div>

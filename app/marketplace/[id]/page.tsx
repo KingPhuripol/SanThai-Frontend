@@ -433,7 +433,7 @@ export default function ProductDetailPage() {
                   {product.artisan?.name || "ร้านค้า SanThai"} {product.artisan?.verified && <CheckCircle2 size={16} className="text-blue-500" fill="currentColor" />}
                 </h3>
                 <p className="text-sm text-brand-900/50 flex items-center justify-center gap-1 mt-1">
-                  <MapPin size={12} className="text-gold-500" /> {product.community?.province || "จ.อุบลราชธานี"}
+                  <MapPin size={12} className="text-gold-500" /> {product.community?.province ? `จ.${product.community.province}` : (product.artisan?.province ? `จ.${product.artisan.province}` : (locale === "en" ? "Thailand" : "ประเทศไทย"))}
                 </p>
               </div>
 
@@ -561,7 +561,7 @@ export default function ProductDetailPage() {
                       "ดอกพิกุล... สัญลักษณ์แห่งความเจริญและความงดงาม"
                     </p>
                     <p className="text-sm text-brand-900/70 leading-[1.8] mb-10">
-                      ลวดลายดอกพิกุลโบราณ สืบทอดจากผืนผ้าโบราณในวังหลวง ทอขึ้นใหม่ด้วยภูมิปัญญาและความประณีตของช่างทอพื้นถิ่น จ.อุบลราชธานี ทุกผืนคือการเชื่อมโยงอดีตสู่ปัจจุบันและอนาคต
+                      {product.fabric?.cultural_meaning_th || product.description_th || `ลวดลายผ้าโบราณ สืบทอดจากผืนผ้าประจำถิ่น ทอขึ้นใหม่ด้วยภูมิปัญญาและความประณีตของช่างทอพื้นถิ่น ${product.community?.province ? `จ.${product.community.province}` : (product.artisan?.province ? `จ.${product.artisan.province}` : "")} ทุกผืนคือการเชื่อมโยงอดีตสู่ปัจจุบันและอนาคต`}
                     </p>
                     
                     <div className="grid grid-cols-2 gap-6">
@@ -620,7 +620,7 @@ export default function ProductDetailPage() {
                     [locale === "en" ? "Dye method" : "วิธีการย้อม", product.dye_method || product.fabric?.dye_method || (locale === "en" ? "Natural Dyeing" : "ย้อมสีธรรมชาติ")],
                     [locale === "en" ? "Texture" : "ผิวสัมผัส", product.texture || (locale === "en" ? "Soft & Smooth" : "นุ่ม ลื่น มีมิติ")],
                     [locale === "en" ? "Production method" : "วิธีผลิต", product.production_method || product.fabric?.weave_technique || (locale === "en" ? "Handwoven Mudmee" : "ทอมือมัดหมี่")],
-                    [locale === "en" ? "Production origin" : "แหล่งผลิต", product.production_origin || (product.community ? `${product.community.name} จ.${product.community.province}` : (locale === "en" ? "Ubon Ratchathani" : "จ.อุบลราชธานี"))],
+                    [locale === "en" ? "Production origin" : "แหล่งผลิต", product.production_origin || (product.community ? `${product.community.name} จ.${product.community.province}` : (product.artisan?.province ? `จ.${product.artisan.province}` : (locale === "en" ? "Thailand" : "ประเทศไทย")))],
                   ].filter(([, value]) => value).map(([label, value]) => (
                     <div key={String(label)} className="rounded-xl border border-brand-200/60 bg-white p-4 shadow-sm hover:border-gold-300 transition-colors">
                       <p className="text-xs font-bold text-brand-900/50">{label}</p>

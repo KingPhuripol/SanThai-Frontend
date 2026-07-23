@@ -12,6 +12,7 @@ export interface Artisan {
   id: number;
   name: string;
   verified?: boolean;
+  province?: string;
   bio_th?: string;
   bio_en?: string;
   avatar_url?: string;

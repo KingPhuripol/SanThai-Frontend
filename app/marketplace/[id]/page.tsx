@@ -340,7 +340,12 @@ export default function ProductDetailPage() {
 
                   {/* Badges */}
                   <div className="flex flex-wrap gap-4 mb-8">
-                    {[{icon: "🌿", t: "ไหมแท้ 100%"}, {icon: "🍃", t: "ย้อมสีธรรมชาติ"}, {icon: "🧶", t: "ทอมือทุกผืน"}, {icon: "✨", t: "ผืนเดียวในโลก"}].map((b, i) => (
+                    {[
+                      { icon: "🌿", t: product.title_th?.includes("ฝ้าย") || product.description_th?.includes("ฝ้าย") ? (locale === "en" ? "100% Organic Cotton" : "ฝ้ายธรรมชาติ 100%") : (locale === "en" ? "100% Pure Silk" : "ไหมแท้ 100%") },
+                      { icon: "🍃", t: locale === "en" ? "Natural Dye" : "ย้อมสีธรรมชาติ" },
+                      { icon: "🧶", t: locale === "en" ? "Handwoven" : "ทอมือทุกผืน" },
+                      { icon: "✨", t: locale === "en" ? "One of a kind" : "ผืนเดียวในโลก" }
+                    ].map((b, i) => (
                       <div key={i} className="flex items-center gap-1.5 text-xs font-medium text-brand-900/70">
                         <span className="text-base">{b.icon}</span> {b.t}
                       </div>
@@ -558,10 +563,10 @@ export default function ProductDetailPage() {
                   <div>
                     <h3 className="text-2xl font-bold text-brand-900 thai-serif mb-6 border-b border-brand-200/50 pb-4">เรื่องราวของผืนผ้า</h3>
                     <p className="text-xl text-brand-900/80 italic mb-6 thai-serif leading-relaxed">
-                      "ดอกพิกุล... สัญลักษณ์แห่งความเจริญและความงดงาม"
+                      {product.title_th?.includes("ดาวล้อมคราม") ? '"ลายดาวล้อมคราม... สัญลักษณ์แห่งภูมิปัญญาและมงคลชีวิต"' : product.title_th?.includes("มัดหมี่") ? '"ผ้ามัดหมี่... สัญลักษณ์แห่งภูมิปัญญาและสายใยผูกพัน"' : '"ลายดอกพิกุล... สัญลักษณ์แห่งความเจริญและความงดงาม"'}
                     </p>
                     <p className="text-sm text-brand-900/70 leading-[1.8] mb-10">
-                      {product.fabric?.cultural_meaning_th || product.description_th || `ลวดลายผ้าโบราณ สืบทอดจากผืนผ้าประจำถิ่น ทอขึ้นใหม่ด้วยภูมิปัญญาและความประณีตของช่างทอพื้นถิ่น ${product.community?.province ? `จ.${product.community.province}` : (product.artisan?.province ? `จ.${product.artisan.province}` : "")} ทุกผืนคือการเชื่อมโยงอดีตสู่ปัจจุบันและอนาคต`}
+                      {product.fabric?.cultural_meaning_th || (product.title_th?.includes("ดาวล้อมคราม") ? "ลายดาวล้อมครามเป็นลวดลายมงคลสืบทอดจากภูมิปัญญาการทอมือผ้ามัดหมี่ย้อมคราม สะท้อนความพิถีพิถันของการเตรียมเส้นฝ้ายและการหมักสีครามธรรมชาติในท้องถิ่น" : product.description_th || `ลวดลายผ้าโบราณ สืบทอดจากผืนผ้าประจำถิ่น ทอขึ้นใหม่ด้วยภูมิปัญญาและความประณีตของช่างทอพื้นถิ่น ${product.community?.province ? `จ.${product.community.province}` : (product.artisan?.province ? `จ.${product.artisan.province}` : "")}`)}
                     </p>
                     
                     <div className="grid grid-cols-2 gap-6">
@@ -587,7 +592,7 @@ export default function ProductDetailPage() {
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
                       {[
-                        { img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_01.jpg", t: "1. คัดสรรเส้นไหม" },
+                        { img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_01.jpg", t: product.title_th?.includes("ฝ้าย") ? "1. คัดสรรเส้นฝ้าย" : "1. คัดสรรเส้นไหม" },
                         { img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_amnat_charoen.jpg", t: "2. ย้อมสีธรรมชาติ" },
                         { img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_02.jpg", t: "3. มัดหมี่ด้วยมือ" },
                         { img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_amnat_charoen_01.jpg", t: "4. ทอด้วยความประณีต" },
@@ -614,7 +619,7 @@ export default function ProductDetailPage() {
                     [locale === "en" ? "Sales unit" : "หน่วยขาย", product.sale_unit === "meter" ? (locale === "en" ? "Metre" : "เมตร") : product.sale_unit === "roll" ? (locale === "en" ? "Roll" : "ม้วน") : product.sale_unit === "set" ? (locale === "en" ? "Set" : "ชุด") : (locale === "en" ? "Piece" : "ผืน/ชิ้น")],
                     [locale === "en" ? "Dimensions" : "ขนาด", product.width_cm || product.length_cm ? `${product.width_cm || "-"} × ${product.length_cm || "-"} cm` : (locale === "en" ? "100 × 200 cm" : "กว้าง 100 ซม. × ยาว 200 ซม.")],
                     [locale === "en" ? "Weight" : "น้ำหนัก", product.weight_g ? `${product.weight_g} ${locale === "en" ? "g" : "กรัม"}` : (locale === "en" ? "350 g" : "350 กรัม")],
-                    [locale === "en" ? "Material" : "วัสดุ/เส้นใย", product.fiber_composition || product.fabric?.fiber_type || (locale === "en" ? "100% Silk" : "ไหมแท้ 100%")],
+                    [locale === "en" ? "Material" : "วัสดุ/เส้นใย", product.fiber_composition || product.fabric?.fiber_type || (product.title_th?.includes("ฝ้าย") ? (locale === "en" ? "100% Organic Cotton" : "ฝ้ายธรรมชาติ 100%") : (locale === "en" ? "100% Silk" : "ไหมแท้ 100%"))],
                     [locale === "en" ? "Colour" : "สี", product.primary_color || (locale === "en" ? "Natural Indigo Blue" : "ครามธรรมชาติ (น้ำเงินเข้ม)")],
                     [locale === "en" ? "Pattern" : "ลวดลาย", product.pattern_name || product.fabric?.name_th || product.title_th],
                     [locale === "en" ? "Dye method" : "วิธีการย้อม", product.dye_method || product.fabric?.dye_method || (locale === "en" ? "Natural Dyeing" : "ย้อมสีธรรมชาติ")],

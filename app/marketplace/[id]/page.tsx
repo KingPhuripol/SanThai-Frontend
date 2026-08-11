@@ -46,6 +46,7 @@ export default function ProductDetailPage() {
   
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState("story");
+  const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
   
   const isLoggedIn = !!getSession();
 
@@ -56,12 +57,20 @@ export default function ProductDetailPage() {
       .catch(() => setError(locale === "en" ? "Product not found" : "ไม่พบสินค้า"))
       .finally(() => setLoading(false));
 
+    productsApi
+      .list({ limit: 8 })
+      .then((items) => {
+        setRecommendedProducts(items.filter((p) => p.id !== Number(id)).slice(0, 3));
+      })
+      .catch(() => {});
+
     const s = getSession();
     if (s) {
       setBuyerName(s.full_name || "");
       setEmail(s.email || "");
     }
   }, [id]);
+
 
   useEffect(() => {
     if (product) trackEvent("product_view", { product_id: product.id });
@@ -173,7 +182,10 @@ export default function ProductDetailPage() {
           <span><ChevronRight size={14}/></span>
           <Link href="/marketplace" className="hover:text-gold-300 transition-colors">{t("marketplace")}</Link>
           <span><ChevronRight size={14}/></span>
-          <Link href="/marketplace" className="hover:text-gold-300 transition-colors">ผ้าไหมมัดหมี่</Link>
+          <Link href="/marketplace" className="hover:text-gold-300 transition-colors">
+            {product.fabric?.weave_technique || product.production_method || product.category || (locale === "en" ? "Thai Textile" : "ผ้าไทย")}
+          </Link>
+
           <span><ChevronRight size={14}/></span>
           <span className="text-white/90">{pick(product.title_th, product.title_en)}</span>
         </div>
@@ -313,17 +325,9 @@ export default function ProductDetailPage() {
                   
                   <div className="flex items-center gap-4 text-sm text-brand-900/60 mb-6">
                     <span>{locale === "en" ? "Product code" : "รหัสสินค้า"} {product.product_code || `ST-PRD-${(product.id).toString().padStart(6, '0')}`}</span>
-                    <div className="flex items-center gap-1">
-                      <span className="font-bold text-brand-900">4.9</span>
-                      <div className="flex text-gold-400">
-                        <Star size={14} fill="currentColor" />
-                        <Star size={14} fill="currentColor" />
-                        <Star size={14} fill="currentColor" />
-                        <Star size={14} fill="currentColor" />
-                        <Star size={14} fill="currentColor" />
-                      </div>
-                      <span className="underline ml-1">(128 รีวิว)</span>
-                    </div>
+                    <span className="text-xs bg-emerald-100 text-emerald-800 font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+                      <CheckCircle2 size={13} /> {locale === "en" ? "Verified SanThai Store" : "ร้านค้ายืนยันโดย SanThai"}
+                    </span>
                   </div>
 
                   <div className="flex items-end gap-3 border-b border-brand-200/50 pb-6 mb-6">
@@ -338,15 +342,15 @@ export default function ProductDetailPage() {
                     {pick(product.description_th, product.description_en, locale === "en" ? "A Thai textile from a verified SanThai store." : "ผ้าไทยจากร้านค้าที่ผ่านการยืนยันโดย SanThai")}
                   </p>
 
-                  {/* Badges */}
+                  {/* Badges - Dynamic based on actual product metadata */}
                   <div className="flex flex-wrap gap-4 mb-8">
                     {[
-                      { icon: "🌿", t: product.title_th?.includes("ฝ้าย") || product.description_th?.includes("ฝ้าย") ? (locale === "en" ? "100% Organic Cotton" : "ฝ้ายธรรมชาติ 100%") : (locale === "en" ? "100% Pure Silk" : "ไหมแท้ 100%") },
-                      { icon: "🍃", t: locale === "en" ? "Natural Dye" : "ย้อมสีธรรมชาติ" },
-                      { icon: "🧶", t: locale === "en" ? "Handwoven" : "ทอมือทุกผืน" },
-                      { icon: "✨", t: locale === "en" ? "One of a kind" : "ผืนเดียวในโลก" }
+                      product.fiber_composition || product.fabric?.fiber_type ? { icon: "🌿", t: product.fiber_composition || product.fabric?.fiber_type } : { icon: "🌿", t: product.title_th?.includes("ฝ้าย") ? (locale === "en" ? "100% Organic Cotton" : "ฝ้ายธรรมชาติ 100%") : (locale === "en" ? "100% Pure Silk" : "ไหมแท้ 100%") },
+                      product.dye_method || product.fabric?.dye_method ? { icon: "🍃", t: product.dye_method || product.fabric?.dye_method } : { icon: "🍃", t: locale === "en" ? "Natural Dye" : "ย้อมสีธรรมชาติ" },
+                      product.production_method || product.fabric?.weave_technique ? { icon: "🧶", t: product.production_method || product.fabric?.weave_technique } : { icon: "🧶", t: locale === "en" ? "Handwoven" : "ทอมือประณีต" },
+                      { icon: "✨", t: locale === "en" ? "Verified Quality" : "การันตีคุณภาพ" }
                     ].map((b, i) => (
-                      <div key={i} className="flex items-center gap-1.5 text-xs font-medium text-brand-900/70">
+                      <div key={i} className="flex items-center gap-1.5 text-xs font-medium text-brand-900/70 bg-white/60 px-3 py-1.5 rounded-lg border border-brand-200/40">
                         <span className="text-base">{b.icon}</span> {b.t}
                       </div>
                     ))}
@@ -442,18 +446,21 @@ export default function ProductDetailPage() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 border-y border-brand-200/50 py-4 mb-6">
-                <div className="text-center">
-                  <p className="text-sm font-bold text-brand-900 flex items-center justify-center gap-1">4.9 <Star size={12} fill="#d4af37" className="text-gold-400" /></p>
-                  <p className="text-[10px] text-brand-900/50">(256 รีวิว)</p>
+              <div className="grid grid-cols-3 gap-1 border-y border-brand-200/50 py-3 mb-6 text-center">
+                <div>
+                  <p className="text-xs font-bold text-brand-900 flex items-center justify-center gap-1">
+                    <Star size={12} className="text-gold-500 fill-gold-500" />
+                    5.0
+                  </p>
+                  <p className="text-[10px] text-brand-900/50 mt-0.5">คะแนนร้าน</p>
                 </div>
-                <div className="text-center border-x border-brand-200/50">
-                  <p className="text-sm font-bold text-brand-900">1,258</p>
-                  <p className="text-[10px] text-brand-900/50">ยอดขายผืน</p>
+                <div className="border-x border-brand-200/50">
+                  <p className="text-xs font-bold text-brand-900">{(product.artisan as any)?.sales_count || 18} ผืน</p>
+                  <p className="text-[10px] text-brand-900/50 mt-0.5">ยอดขาย</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-sm font-bold text-brand-900">3 ปี</p>
-                  <p className="text-[10px] text-brand-900/50">เข้าร่วม</p>
+                <div>
+                  <p className="text-xs font-bold text-brand-900">{(product.artisan as any)?.years_joined || 1} ปี</p>
+                  <p className="text-[10px] text-brand-900/50 mt-0.5">เข้าร่วม</p>
                 </div>
               </div>
 
@@ -515,20 +522,29 @@ export default function ProductDetailPage() {
                 <Link href="/marketplace" className="text-[10px] text-brand-900/50 hover:text-brand-900 font-medium">ดูทั้งหมด</Link>
               </div>
               <div className="space-y-4">
-                {[
-                  { name: "ผ้าไหมมัดหมี่ลายโบราณ", price: "2,750", img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_amnat_charoen_01.jpg" },
-                  { name: "ผ้าไหมแพรวา", price: "3,250", img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_01.jpg" }
-                ].map((item, i) => (
-                  <div key={i} className="flex gap-3 group cursor-pointer">
-                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-white shrink-0 relative">
-                      <Image src={item.img} alt={item.name} fill sizes="80px" className="object-cover group-hover:scale-110 transition-transform" />
-                    </div>
-                    <div className="flex flex-col justify-center">
-                      <p className="text-xs font-bold text-brand-900 line-clamp-2 leading-tight group-hover:text-gold-600 transition-colors">{item.name}</p>
-                      <p className="text-sm font-bold text-brand-900 thai-serif mt-1">฿{item.price}</p>
-                    </div>
-                  </div>
-                ))}
+                {recommendedProducts.length > 0 ? (
+                  recommendedProducts.map((item) => (
+                    <Link key={item.id} href={`/marketplace/${item.id}`} className="flex gap-3 group cursor-pointer">
+                      <div className="w-20 h-20 rounded-xl overflow-hidden bg-white shrink-0 relative">
+                        <Image
+                          src={item.images?.[0] || item.fabric?.image_url || "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_01.jpg"}
+                          alt={item.title_th}
+                          fill
+                          sizes="80px"
+                          className="object-cover group-hover:scale-110 transition-transform"
+                        />
+                      </div>
+                      <div className="flex flex-col justify-center">
+                        <p className="text-xs font-bold text-brand-900 line-clamp-2 leading-tight group-hover:text-gold-600 transition-colors">
+                          {pick(item.title_th, item.title_en)}
+                        </p>
+                        <p className="text-sm font-bold text-brand-900 thai-serif mt-1">฿{item.price_thb.toLocaleString()}</p>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="text-xs text-brand-900/50">กำลังโหลดรายการแนะนำ...</p>
+                )}
               </div>
             </div>
             
@@ -537,14 +553,14 @@ export default function ProductDetailPage() {
 
         {/* Bottom Details Tabs */}
         {!orderDone && (
-          <div className="mt-8 bg-[#FAF6ED] rounded-[24px] overflow-hidden shadow-2xl">
+          <div id="bottom-tabs" className="mt-8 bg-[#FAF6ED] rounded-[24px] overflow-hidden shadow-2xl">
             {/* Tab Headers */}
             <div className="flex overflow-x-auto bg-brand-900 text-white scrollbar-hide">
               {[
                 { id: "story", label: locale === "en" ? "Fabric story" : "เรื่องราวของผืนผ้า" },
                 { id: "details", label: locale === "en" ? "Product details" : "รายละเอียดสินค้า" },
                 { id: "care", label: locale === "en" ? "Care instructions" : "การดูแลรักษา" },
-                { id: "reviews", label: locale === "en" ? "Customer reviews (128)" : "รีวิวจากลูกค้า (128)" }
+                { id: "reviews", label: locale === "en" ? "Customer reviews" : "รีวิวจากลูกค้า" }
               ].map(tab => (
                 <button 
                   key={tab.id}
@@ -563,10 +579,10 @@ export default function ProductDetailPage() {
                   <div>
                     <h3 className="text-2xl font-bold text-brand-900 thai-serif mb-6 border-b border-brand-200/50 pb-4">เรื่องราวของผืนผ้า</h3>
                     <p className="text-xl text-brand-900/80 italic mb-6 thai-serif leading-relaxed">
-                      {product.title_th?.includes("ดาวล้อมคราม") ? '"ลายดาวล้อมคราม... สัญลักษณ์แห่งภูมิปัญญาและมงคลชีวิต"' : product.title_th?.includes("มัดหมี่") ? '"ผ้ามัดหมี่... สัญลักษณ์แห่งภูมิปัญญาและสายใยผูกพัน"' : '"ลายดอกพิกุล... สัญลักษณ์แห่งความเจริญและความงดงาม"'}
+                      &quot;{pick(product.title_th, product.title_en)}&quot;
                     </p>
                     <p className="text-sm text-brand-900/70 leading-[1.8] mb-10">
-                      {product.fabric?.cultural_meaning_th || (product.title_th?.includes("ดาวล้อมคราม") ? "ลายดาวล้อมครามเป็นลวดลายมงคลสืบทอดจากภูมิปัญญาการทอมือผ้ามัดหมี่ย้อมคราม สะท้อนความพิถีพิถันของการเตรียมเส้นฝ้ายและการหมักสีครามธรรมชาติในท้องถิ่น" : product.description_th || `ลวดลายผ้าโบราณ สืบทอดจากผืนผ้าประจำถิ่น ทอขึ้นใหม่ด้วยภูมิปัญญาและความประณีตของช่างทอพื้นถิ่น ${product.community?.province ? `จ.${product.community.province}` : (product.artisan?.province ? `จ.${product.artisan.province}` : "")}`)}
+                      {product.fabric?.cultural_meaning_th || product.fabric?.story_th || pick(product.description_th, product.description_en, "ผืนผ้าทอมือทรงคุณค่า รังสรรค์ด้วยภูมิปัญญาจากผู้ผลิตพื้นถิ่น")}
                     </p>
                     
                     <div className="grid grid-cols-2 gap-6">

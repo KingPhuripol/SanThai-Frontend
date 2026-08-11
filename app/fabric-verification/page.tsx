@@ -146,7 +146,16 @@ export default function FabricVerificationPage() {
     event.target.value = "";
   };
 
+  const mobileCameraRef = useRef<HTMLInputElement>(null);
+
   const startCamera = async () => {
+    // On mobile devices, use native camera input (works reliably on iOS + Android)
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+      mobileCameraRef.current?.click();
+      return;
+    }
+    // Desktop: try WebRTC stream
     if (!navigator.mediaDevices?.getUserMedia) {
       setError(locale === "en" ? "This browser does not support camera access. Upload an image instead." : "เบราว์เซอร์นี้ไม่รองรับการเปิดกล้อง กรุณาอัปโหลดรูปภาพแทน");
       return;
@@ -157,7 +166,8 @@ export default function FabricVerificationPage() {
       setIsCameraActive(true);
       setError(null);
     } catch {
-      setError(locale === "en" ? "We could not access the camera. Allow camera access or upload an image instead." : "ไม่สามารถเข้าถึงกล้องได้ กรุณาอนุญาตกล้องหรืออัปโหลดรูปภาพแทน");
+      // Desktop getUserMedia failed — fall back to native input
+      mobileCameraRef.current?.click();
     }
   };
 
@@ -174,6 +184,7 @@ export default function FabricVerificationPage() {
       selectFile(captured);
     }, "image/jpeg", 0.9);
   };
+
 
   const reset = () => {
     stopCamera();
@@ -221,7 +232,7 @@ export default function FabricVerificationPage() {
                 <div
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={handleDrop}
-                  className="relative mt-6 aspect-[16/10] overflow-hidden rounded-2xl border-2 border-dashed border-brand-200 bg-brand-50"
+                  className="relative mt-6 h-[280px] sm:h-[320px] w-full overflow-hidden rounded-2xl border-2 border-dashed border-brand-200 bg-brand-50"
                 >
                   {isCameraActive ? (
                     <><video ref={videoRef} autoPlay playsInline className="h-full w-full object-cover" /><div className="pointer-events-none absolute inset-7 rounded-2xl border-2 border-gold-400/80" /></>
@@ -237,6 +248,20 @@ export default function FabricVerificationPage() {
                 </div>
                 <canvas ref={canvasRef} className="hidden" />
                 <input ref={inputRef} type="file" accept="image/*,.heic,.heif,.png,.jpg,.jpeg,.webp" className="hidden" onChange={onFileChange} />
+                {/* Native camera capture — works on iOS & Android without needing getUserMedia permissions */}
+                <input
+                  ref={mobileCameraRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) selectFile(f);
+                    e.target.value = "";
+                  }}
+                />
+
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   {isCameraActive ? (

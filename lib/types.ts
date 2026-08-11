@@ -37,6 +37,7 @@ export interface FabricPattern {
   fiber_type?: string;
   cultural_meaning_th?: string;
   cultural_meaning_en?: string;
+  story_th?: string;
   usage_rights: "commercial" | "personal" | "restricted";
   story_tags?: StoryTags;
   image_url?: string;

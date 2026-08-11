@@ -24,11 +24,24 @@ const MAP_COLORS: Record<string, { fill: string; stroke: string }> = {
   south: { fill: "#1474a6", stroke: "#67c8f3" },
 };
 
+const REGION_COORDS: Record<string, { lat: number; lng: number }> = {
+  north: { lat: 18.8, lng: 99.0 },
+  northeast: { lat: 16.5, lng: 103.5 },
+  central: { lat: 14.5, lng: 100.5 },
+  south: { lat: 8.5, lng: 99.0 },
+};
+
 function ThailandMap({ communities, region, setRegion, locale }: { communities: any[]; region: string; setRegion: (value: string) => void; locale: "th" | "en" }) {
   const marker = (community: any) => {
-    if (typeof community.latitude !== "number" || typeof community.longitude !== "number") return null;
-    const x = 40 + (community.longitude - 97.3) * 55;
-    const y = 20 + (20.5 - community.latitude) * 34;
+    let lat = community.latitude;
+    let lng = community.longitude;
+    if (typeof lat !== "number" || typeof lng !== "number") {
+      const fb = REGION_COORDS[community.region] || REGION_COORDS.north;
+      lat = fb.lat + ((community.id * 17) % 15 - 7) * 0.1;
+      lng = fb.lng + ((community.id * 23) % 15 - 7) * 0.1;
+    }
+    const x = 40 + (lng - 97.3) * 55;
+    const y = 20 + (20.5 - lat) * 34;
     const selected = region === "all" || region === community.region;
     return <g key={community.id} className={`cursor-pointer transition ${selected ? "opacity-100" : "opacity-30"}`} onClick={() => setRegion(community.region)}><circle cx={x} cy={y} r="12" fill="#f7d46b" opacity=".25"/><circle cx={x} cy={y} r="6" fill="#f7d46b" stroke="#fff7df" strokeWidth="2"/><title>{community.name} · {community.store_count} {locale === "en" ? "stores" : "ร้านค้า"}</title></g>;
   };
@@ -40,6 +53,9 @@ function ThailandMap({ communities, region, setRegion, locale }: { communities: 
   </svg><div className="pointer-events-none absolute inset-x-0 bottom-3 text-center text-xs text-white/60">{locale === "en" ? "Select a region or a gold marker to filter verified stores" : "กดภูมิภาคหรือหมุดสีทองเพื่อกรองร้านค้ายืนยันแล้ว"}</div></div></div>;
 }
 
+const INVALID_PROVINCES = ["ติ่งแน้ด", "ไม่ระบุ", "ทดสอบ"];
+const INVALID_STORE_NAMES = ["ร้านพี่", "ร้านผม", "ร้านเอ", "pangpond", "smoke artisan", "final check", "ทดสอบ"];
+
 export default function CommunityPage() {
   const { locale, t } = useLanguage();
   const [communities, setCommunities] = useState<any[]>([]);
@@ -47,11 +63,29 @@ export default function CommunityPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    artisanApi.listCommunities().then(setCommunities).catch(() => setCommunities([])).finally(() => setLoading(false));
+    artisanApi.listCommunities().then((list) => {
+      const filtered = (list || []).filter((item: any) => {
+        const prov = item.province || "";
+        if (INVALID_PROVINCES.some((p) => prov.includes(p))) return false;
+        return true;
+      });
+      setCommunities(filtered);
+    }).catch(() => setCommunities([])).finally(() => setLoading(false));
   }, []);
 
-  const visible = useMemo(() => region === "all" ? communities : communities.filter((item) => item.region === region), [communities, region]);
+  const visible = useMemo(() => {
+    const list = region === "all" ? communities : communities.filter((item) => item.region === region);
+    return list.map((c) => ({
+      ...c,
+      stores: (c.stores || []).filter((s: any) => {
+        const name = (s.name || "").toLowerCase();
+        return !INVALID_STORE_NAMES.some((kw) => name.includes(kw));
+      }),
+    })).filter((c) => c.stores && c.stores.length > 0);
+  }, [communities, region]);
+
   const totalStores = communities.reduce((sum, item) => sum + (item.store_count || 0), 0);
+
 
   return <main className="min-h-screen bg-brand-900 pb-20 pt-28 text-white">
     <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -61,11 +95,16 @@ export default function CommunityPage() {
       <section className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-7"><div className="flex flex-wrap gap-2">{REGIONS.map((item) => <button key={item.id} onClick={() => setRegion(item.id)} className={`rounded-full px-4 py-2 text-sm font-bold transition ${region === item.id ? item.tone : "bg-white/10 text-white/70 hover:bg-white/20"}`}>{locale === "en" ? item.en : item.th}</button>)}</div><ThailandMap communities={communities} region={region} setRegion={setRegion} locale={locale} /></section>
 
       <section className="mt-10">
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-2xl font-bold thai-serif">
-            {locale === "en" ? "Verified Stores in " : "ร้านค้ายืนยันแล้วใน"}
-            {region === "all" ? (locale === "en" ? "Thailand" : "ทุกภูมิภาค") : (() => { const selected = REGIONS.find((item) => item.id === region); return locale === "en" ? selected?.en : selected?.th; })()}
-          </h2>
+        <div className="mb-5 flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-3">
+            <h2 className="text-2xl font-bold thai-serif">
+              {locale === "en" ? "Verified Stores in " : "ร้านค้ายืนยันแล้วใน"}
+              {region === "all" ? (locale === "en" ? "Thailand" : "ทุกภูมิภาค") : (() => { const selected = REGIONS.find((item) => item.id === region); return locale === "en" ? selected?.en : selected?.th; })()}
+            </h2>
+            <span className="bg-gold-400 text-brand-950 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+              {visible.flatMap(c => c.stores || []).length} {locale === "en" ? "stores" : "ร้านค้า"}
+            </span>
+          </div>
           <Link href="/marketplace" className="inline-flex items-center gap-1 text-sm font-bold text-gold-300">
             {locale === "en" ? "Browse marketplace" : "ดูตลาดผ้า"} <ArrowRight size={15} />
           </Link>
@@ -84,7 +123,7 @@ export default function CommunityPage() {
               (community.stores || []).map((store: any) => (
                 <article key={store.id} className="overflow-hidden rounded-3xl bg-[#FAF6ED] text-brand-900 shadow-xl transition hover:-translate-y-1 flex flex-col justify-between">
                   <div className="relative h-44">
-                    <Image src={store.image_url || FALLBACK_IMAGE} alt={store.name} fill className="object-cover" />
+                    <Image src={store.image_url || FALLBACK_IMAGE} alt={store.name} fill sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw" className="object-cover" />
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent p-4 pt-12 text-sm font-bold text-white">
                       <MapPin className="inline mr-1" size={14} />
                       {locale === "en" ? community.province_en || community.province : `จ.${community.province}`}

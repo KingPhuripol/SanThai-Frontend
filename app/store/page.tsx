@@ -74,26 +74,23 @@ export default function StoreDashboardPage() {
           <div className="lg:col-span-1 space-y-6">
             
             {/* Store Settings */}
-            <div className="bg-white rounded-[24px] p-6 shadow-sm border border-brand-200/50">
+            <Link href="/profile" className="bg-white rounded-[24px] p-6 shadow-sm border border-brand-200/50 block hover:border-gold-400 transition-colors group">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-brand-950 flex items-center gap-2">
                   <Settings size={20} className="text-brand-900/60" />
                   {locale === "en" ? "Store settings" : "ตั้งค่าร้านค้า"}
                 </h2>
-                <button className="text-brand-900/40 hover:text-brand-900 transition-colors">
+                <div className="text-brand-900/40 group-hover:text-brand-900 transition-colors">
                   <ChevronRight size={20} />
-                </button>
+                </div>
               </div>
               <div className="bg-brand-50 p-4 rounded-xl flex flex-col gap-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-brand-900">{locale === "en" ? "Store members (weavers)" : "สมาชิกในร้าน (ช่างทอ)"}</span>
-                  <span className="text-xs font-bold bg-brand-200 text-brand-900 px-2 py-1 rounded-full">3 {locale === "en" ? "people" : "คน"}</span>
+                  <span className="text-sm font-medium text-brand-900">{locale === "en" ? "Edit Store Profile" : "แก้ไขโปรไฟล์ร้านค้า / ข้อมูลทั่วไป"}</span>
+                  <span className="text-xs font-bold bg-gold-400 text-brand-950 px-2.5 py-1 rounded-full">{locale === "en" ? "Edit" : "แก้ไข"}</span>
                 </div>
-                <button className="text-[13px] text-brand-900/60 flex items-center gap-1 hover:text-brand-900 transition-colors mt-2">
-                  <Users size={14} /> {locale === "en" ? "Manage members" : "จัดการสมาชิก"}
-                </button>
               </div>
-            </div>
+            </Link>
 
             {/* Store Status (Locked for now) */}
             <div className="bg-white rounded-[24px] p-6 shadow-sm border border-brand-200/50 relative overflow-hidden">

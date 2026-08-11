@@ -21,6 +21,9 @@ export default function ProfilePage() {
     email: "",
     password: "",
     community_name: "",
+    province: "",
+    region: "",
+    bio_th: "",
   });
 
   useEffect(() => {
@@ -34,6 +37,9 @@ export default function ProfilePage() {
         email: s.email || "",
         password: "",
         community_name: s.artisan_name || "",
+        province: "",
+        region: "",
+        bio_th: "",
       });
       setLoading(false);
     }
@@ -78,6 +84,9 @@ export default function ProfilePage() {
       
       if (session?.role === "artisan") {
         payload.community_name = form.community_name;
+        if (form.province) payload.province = form.province;
+        if (form.region) payload.region = form.region;
+        if (form.bio_th) payload.bio_th = form.bio_th;
       }
 
       const updatedSession = await authApi.updateProfile(payload);
@@ -85,7 +94,7 @@ export default function ProfilePage() {
       setSession(updatedSession);
       
       setForm(f => ({ ...f, password: "" }));
-      setSuccess(locale === "en" ? "Profile updated successfully." : "อัปเดตข้อมูลสำเร็จ");
+      setSuccess(locale === "en" ? "Profile updated successfully." : "อัปเดตข้อมูลร้านค้า/โปรไฟล์สำเร็จ");
     } catch (err: any) {
       setError(err?.response?.data?.detail || (locale === "en" ? "Failed to update profile." : "ไม่สามารถอัปเดตข้อมูลได้"));
     } finally {
@@ -156,19 +165,65 @@ export default function ProfilePage() {
           </div>
 
           {session?.role === "artisan" && (
-            <div>
-              <label className="block text-sm font-semibold text-brand-900 mb-2">
-                {locale === "en" ? "Store Name" : "ชื่อร้านค้า"}
-              </label>
-              <div className="relative">
-                <Store size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
-                <input
-                  value={form.community_name}
-                  onChange={(e) => set("community_name", e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            <>
+              <div>
+                <label className="block text-sm font-semibold text-brand-900 mb-2">
+                  {locale === "en" ? "Store Name" : "ชื่อร้านค้า / ชุมชน"}
+                </label>
+                <div className="relative">
+                  <Store size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
+                  <input
+                    value={form.community_name}
+                    onChange={(e) => set("community_name", e.target.value)}
+                    placeholder="เช่น ร้านผ้าไหมทอมือแม่บัวบาน"
+                    className="w-full pl-11 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-brand-900 mb-2">
+                    {locale === "en" ? "Province" : "จังหวัด"}
+                  </label>
+                  <input
+                    value={form.province}
+                    onChange={(e) => set("province", e.target.value)}
+                    placeholder="เช่น ขอนแก่น"
+                    className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-brand-900 mb-2">
+                    {locale === "en" ? "Region" : "ภาค"}
+                  </label>
+                  <select
+                    value={form.region}
+                    onChange={(e) => set("region", e.target.value)}
+                    className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  >
+                    <option value="">-- เลือกร้านค้าภาค --</option>
+                    <option value="north">ภาคเหนือ</option>
+                    <option value="northeast">ภาคอีสาน</option>
+                    <option value="central">ภาคกลาง</option>
+                    <option value="south">ภาคใต้</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-brand-900 mb-2">
+                  {locale === "en" ? "Store Bio / Description" : "คำบรรยายร้านค้า / เรื่องราวของร้าน"}
+                </label>
+                <textarea
+                  value={form.bio_th}
+                  onChange={(e) => set("bio_th", e.target.value)}
+                  rows={3}
+                  placeholder="เช่น สานต่อภูมิปัญญาผ้ามัดหมี่ย้อมสีธรรมชาติกว่า 30 ปี..."
+                  className="w-full p-4 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
                 />
               </div>
-            </div>
+            </>
           )}
 
           <div>

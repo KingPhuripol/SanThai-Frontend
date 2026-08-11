@@ -144,7 +144,7 @@ export default function DesignerUploadPage() {
         
         <h1 className="text-2xl font-bold text-brand-900 mb-2">อัปโหลดผลงานออกแบบ</h1>
         <p className="text-sm text-brand-500 mb-8">
-          สร้างสินค้าใหม่และเลือก "ลายผ้าต้นทาง" เพื่อผูกผลงานของคุณกับชุมชนผู้ผลิต
+          สร้างสินค้าใหม่และเลือก &quot;ลายผ้าต้นทาง&quot; เพื่อผูกผลงานของคุณกับชุมชนผู้ผลิต
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5 bg-white p-6 rounded-2xl border border-amber-100 shadow-sm">

@@ -71,6 +71,7 @@ function AddProductForm() {
   const [activeTab, setActiveTab] = useState(1);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);  // URLs of existing product images
   const [imageChecks, setImageChecks] = useState({ overall: false, detail: false, scale: false, origin: false });
   const [fabrics, setFabrics] = useState<FabricPattern[]>([]);
   const [loadingFabrics, setLoadingFabrics] = useState(true);
@@ -119,6 +120,12 @@ function AddProductForm() {
           shippingCost: String(product.shipping_cost_thb || ""),
           freeShipping: Boolean(product.free_shipping),
         }));
+        // Pre-load existing images so user doesn't need to re-upload them every time
+        if (product.images && product.images.length > 0) {
+          setExistingImageUrls(product.images);
+          setImagePreviews(product.images);
+          setImageChecks({ overall: true, detail: true, scale: true, origin: true });
+        }
       })
       .catch(() => {
         alert("ไม่พบสินค้า หรือคุณไม่มีสิทธิ์แก้ไข");
@@ -183,8 +190,17 @@ function AddProductForm() {
   };
 
   const removeImage = (index: number) => {
-    setImageFiles((current) => current.filter((_, itemIndex) => itemIndex !== index));
-    setImagePreviews((current) => current.filter((_, itemIndex) => itemIndex !== index));
+    const preview = imagePreviews[index];
+    // If it's an existing URL (not a blob URL), remove from existingImageUrls
+    if (existingImageUrls.includes(preview)) {
+      setExistingImageUrls((current) => current.filter((url) => url !== preview));
+      setImagePreviews((current) => current.filter((_, i) => i !== index));
+    } else {
+      // It's a newly uploaded file — find index in imageFiles relative to existingImageUrls offset
+      const newFileIndex = index - existingImageUrls.length;
+      setImageFiles((current) => current.filter((_, i) => i !== newFileIndex));
+      setImagePreviews((current) => current.filter((_, i) => i !== index));
+    }
   };
 
   const handleSubmit = async (publish = true) => {
@@ -200,7 +216,7 @@ function AddProductForm() {
       alert("ราคาต้องมากกว่า 0 และจำนวนสินค้าเป็นจำนวนเต็มตั้งแต่ 0 ขึ้นไป");
       return;
     }
-    if (publish && !editingProductId && imageFiles.length === 0) {
+    if (publish && imageFiles.length === 0 && existingImageUrls.length === 0) {
       alert("กรุณาอัปโหลดรูปสินค้าอย่างน้อย 1 รูป");
       return;
     }
@@ -248,6 +264,8 @@ function AddProductForm() {
       const { compressImages } = await import("@/lib/imageUtils");
       const compressedFiles = await compressImages(imageFiles);
       compressedFiles.forEach((file) => fd.append("images", file));
+      // Send existing image URLs so backend keeps them (unless the user deleted them)
+      existingImageUrls.forEach((url) => fd.append("existing_images", url));
       
       if (editingProductId) {
         await productsApi.update(editingProductId, fd);

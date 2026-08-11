@@ -86,33 +86,56 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Official LINE Contact */}
-          <div className="space-y-3">
+          {/* Official Contacts */}
+          <div className="space-y-4">
             <h3 className="text-sm font-bold text-gold-300 thai-serif uppercase tracking-wider">
-              {locale === "en" ? "LINE Official Contact" : "ติดต่อเราทาง LINE Official"}
+              {locale === "en" ? "Connect Channels" : "ช่องทางติดต่อสานไทย"}
             </h3>
-            <div className="bg-white/5 border border-green-500/30 rounded-2xl p-4 space-y-3">
+            
+            {/* Facebook Page */}
+            <div className="bg-white/5 border border-blue-500/30 rounded-2xl p-3.5 space-y-2.5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#06C755] flex items-center justify-center text-white shrink-0 shadow-md">
-                  <MessageCircle size={22} />
+                <div className="w-9 h-9 rounded-xl bg-[#1877F2] flex items-center justify-center text-white shrink-0 shadow-md">
+                  <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 </div>
                 <div>
-                  <p className="text-xs text-white/60 font-medium">LINE OA (SanThai)</p>
+                  <p className="text-xs text-white/60 font-medium">Facebook Page</p>
+                  <p className="text-sm font-bold text-white tracking-wide">เพจสานไทย</p>
+                </div>
+              </div>
+              <a
+                href="https://www.facebook.com/share/1BWToyNdim/?mibextid=wwXIfr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-2 bg-[#1877F2] hover:bg-[#166fe5] text-white text-xs font-bold rounded-xl transition-all shadow-md"
+              >
+                {locale === "en" ? "Visit Facebook Page" : "เข้าชม Facebook เพจสานไทย"}
+              </a>
+            </div>
+
+            {/* Official LINE */}
+            <div className="bg-white/5 border border-green-500/30 rounded-2xl p-3.5 space-y-2.5">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#06C755] flex items-center justify-center text-white shrink-0 shadow-md">
+                  <MessageCircle size={20} />
+                </div>
+                <div>
+                  <p className="text-xs text-white/60 font-medium">LINE Official</p>
                   <p className="text-sm font-bold text-white tracking-wide">@956vdrxn</p>
-                  <p className="text-[11px] text-green-400 font-medium">LineSanThaiKub</p>
                 </div>
               </div>
               <a
                 href="https://line.me/R/ti/p/@956vdrxn"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-bold rounded-xl transition-all shadow-md"
+                className="flex items-center justify-center gap-2 w-full py-2 bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-bold rounded-xl transition-all shadow-md"
               >
-                <MessageCircle size={15} />
+                <MessageCircle size={14} />
                 {locale === "en" ? "Add LINE @956vdrxn" : "แอด LINE @956vdrxn"}
               </a>
             </div>
           </div>
+
 
         </div>
 

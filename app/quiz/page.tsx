@@ -177,19 +177,21 @@ const STEPS = [
     question: "คุณให้ความสำคัญกับสิ่งใดมากที่สุดเวลาเลือกผ้าไทย?",
     sub: "คุณค่าของผ้าไทยในมุมมองของคุณ",
     options: [
-      { label: "📜 เรื่องราว ภูมิปัญญาย้อมครามและ SanThai Passport", value: "heritage" },
-      { label: "🧵 สัมผัสนุ่มสบาย สวมใส่ง่าย ระบายอากาศดี",          value: "comfort" },
-      { label: "💎 ลวดลายโดดเด่น ยอดเยี่ยมไม่ซ้ำใคร",                 value: "uniqueness" },
-      { label: "🏷️ ความคุ้มค่า คุณภาพทอมือ 100%",                     value: "value" },
+      { label: "📜 SanThai Passport สินค้าห้ามเก๊ — ตรวจสอบสินค้าแท้ 100%", value: "heritage" },
+      { label: "✨ คาแรคเตอร์ที่ตรงกับคุณ — ลายและสีสันที่ใช่กับบุคลิกคุณพอดี", value: "uniqueness" },
+      { label: "🔍 สแกนผ้าทุกผืนบนแพลตฟอร์มได้ — AI วิเคราะห์ลายผ้าทันที", value: "comfort" },
+      { label: "🏷️ อื่นๆ — คุณค่าและการใช้งานอื่น", value: "value" },
     ],
   },
 ];
 
 const QUIZ_EN: Record<string, { question: string; sub: string; options: Record<string, string> }> = {
   gender: { question: "Who are you?", sub: "This helps us suggest suitable patterns and fabric styles.", options: { female: "Women", male: "Men", unisex: "Any gender / prefer not to say" } },
+  lifestyle: { question: "Which leisure lifestyle suits you best?", sub: "Choose the vibe that expresses your inner energy.", options: { nature: "🌿 Nature & books (Introvert)", travel: "✈️ Travel & meet new people (Extrovert)", creative: "🎨 Creative crafts & art (Intuitive)", social: "🎉 Socialising & group activities (Social)" } },
   occasion: { question: "What occasion is the textile for?", sub: "Choose the occasion that best matches your needs.", options: { wedding: "Wedding / auspicious ceremony", ceremony: "Memorial / important ceremony", formal: "Work / meeting", casual: "Everyday wear", gift: "Gift / souvenir" } },
   personality: { question: "Which style do you prefer?", sub: "Your style helps us choose patterns more precisely.", options: { classic: "Classic / traditional", modern: "Modern / contemporary", minimal: "Minimal / simple", bold: "Colourful / bold" } },
   color: { question: "Which colour palette do you prefer?", sub: "Colour informs the pattern and dye recommendation.", options: { red_purple: "Red / purple", gold_yellow: "Gold / yellow", blue_indigo: "Blue / indigo", green_earth: "Green / earth", neutral: "White / cream / beige" } },
+  values: { question: "What matters most when choosing Thai fabric?", sub: "Your values help us refine the recommendation.", options: { heritage: "📜 SanThai Passport — 100% authentic, no fakes", uniqueness: "✨ Character match — patterns that suit your personality", comfort: "🔍 Scan any fabric on platform — AI analyses instantly", value: "🏷️ Other — value and other uses" } },
   budget: { question: "What is your budget?", sub: "There is no wrong answer.", options: { "3000": "Up to ฿3,000", "6000": "฿3,000 – ฿6,000", "10000": "฿6,000 – ฿10,000", "0": "No limit" } },
 };
 

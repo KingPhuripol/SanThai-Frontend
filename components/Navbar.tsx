@@ -60,7 +60,12 @@ export default function Navbar() {
   // Dynamic links based on role
   const roleLinks = [];
   if (session?.role === "artisan" || session?.role === "designer") {
+    roleLinks.push({ href: `/${session.role}/dashboard`, label: t("dashboard") });
     roleLinks.push({ href: "/store", label: t("store") });
+  } else if (session?.role === "admin") {
+    roleLinks.push({ href: "/admin/dashboard", label: t("dashboard") });
+  } else if (session) {
+    roleLinks.push({ href: "/orders", label: t("myOrders") });
   }
 
   const allLinks = [...baseLinks, ...roleLinks];

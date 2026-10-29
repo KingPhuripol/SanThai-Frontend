@@ -29,6 +29,16 @@ export default function ArtisanOrdersPage() {
   }, [session]);
 
   const handleUpdateStatus = async (orderId: number, currentStatus: string) => {
+    if (currentStatus === "payment_pending_review") {
+      if (!session || !confirm(locale === "en" ? "Confirm the slip matches a received payment?" : "ยืนยันว่าได้รับเงินตรงกับสลิปแล้ว?")) return;
+      try {
+        await artisanApi.updateOrderStatus(orderId, { status: "processing", reason: "ร้านยืนยันการชำระเงิน" });
+        fetchOrders(session.artisan_id!);
+      } catch (e) {
+        alert((locale === "en" ? "Could not update status: " : "อัปเดตสถานะไม่สำเร็จ: ") + e);
+      }
+      return;
+    }
     const trackingNumber = prompt(locale === "en" ? "Enter tracking number to confirm shipment:" : "กรุณากรอกหมายเลขพัสดุ (Tracking Number) เพื่อยืนยันการจัดส่ง:");
     if (!trackingNumber || !session) return;
 
@@ -121,6 +131,8 @@ export default function ArtisanOrdersPage() {
                     <td className="px-4 py-4">
                       {o.status === "pending" ? (
                         <span className="px-2 py-1 bg-stone-100 text-stone-600 rounded-md text-xs font-semibold">{locale === "en" ? "Awaiting payment" : "รอชำระเงิน"}</span>
+                      ) : o.status === "payment_pending_review" ? (
+                        <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-md text-xs font-semibold">{locale === "en" ? "Check payment slip" : "รอตรวจสลิป"}</span>
                       ) : o.status === "processing" ? (
                         <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-md text-xs font-semibold">{locale === "en" ? "Preparing shipment" : "เตรียมจัดส่ง"}</span>
                       ) : (
@@ -131,12 +143,14 @@ export default function ArtisanOrdersPage() {
                       )}
                     </td>
                     <td className="px-4 py-4">
-                      {o.status === "processing" && (
+                      {(o.status === "processing" || o.status === "payment_pending_review") && (
                         <button
                           onClick={() => handleUpdateStatus(o.id, o.status)}
                           className="px-3 py-1.5 bg-brand-900 text-white rounded-lg text-xs font-bold hover:bg-brand-800 transition-colors"
                         >
-                          {locale === "en" ? "Ship order" : "จัดส่งสินค้า"}
+                          {o.status === "payment_pending_review"
+                            ? (locale === "en" ? "Confirm payment" : "ยืนยันชำระเงิน")
+                            : (locale === "en" ? "Ship order" : "จัดส่งสินค้า")}
                         </button>
                       )}
                     </td>

@@ -6,12 +6,12 @@ export type Locale = "th" | "en";
 
 const COPY = {
   th: {
-    home: "หน้าหลัก", identity: "ค้นหาตัวตน", marketplace: "ตลาดผ้า", community: "ชุมชนผู้สร้างสรรค์", about: "เกี่ยวกับเรา", store: "การจัดการร้านค้า", verifyFabric: "ตรวจสอบผ้า",
+    home: "หน้าหลัก", identity: "ค้นหาตัวตน", marketplace: "ตลาดผ้า", community: "ชุมชนผู้สร้างสรรค์", about: "เกี่ยวกับเรา", store: "การจัดการร้านค้า", verifyFabric: "ตรวจสอบผ้า", dashboard: "แดชบอร์ด", myOrders: "คำสั่งซื้อของฉัน",
     login: "เข้าสู่ระบบ", logout: "ออกจากระบบ", cart: "ตะกร้าสินค้า", customer: "ผู้ซื้อ", artisan: "ร้านค้าผู้ผลิต", designer: "นักออกแบบ", admin: "ผู้ดูแลระบบ",
     thaiForEveryIdentity: "ผ้าไทย ใส่ได้ทุกตัวตน", thai: "ไทย", english: "English", language: "ภาษา", viewProduct: "ดูสินค้า", viewStore: "ดูหน้าร้านค้า",
   },
   en: {
-    home: "Home", identity: "Find Your Style", marketplace: "Fabric Marketplace", community: "Creative Communities", about: "About Us", store: "Store Management", verifyFabric: "Verify Fabric",
+    home: "Home", identity: "Find Your Style", marketplace: "Fabric Marketplace", community: "Creative Communities", about: "About Us", store: "Store Management", verifyFabric: "Verify Fabric", dashboard: "Dashboard", myOrders: "My Orders",
     login: "Log in", logout: "Log out", cart: "Cart", customer: "Customer", artisan: "Verified Store", designer: "Designer", admin: "Administrator",
     thaiForEveryIdentity: "Thai textiles for every identity", thai: "ไทย", english: "English", language: "Language", viewProduct: "View product", viewStore: "Visit store",
   },

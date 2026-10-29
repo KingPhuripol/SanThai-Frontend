@@ -29,7 +29,7 @@ export default function AdminOrdersPage() {
 
   const handleUpdateStatus = async (orderId: number) => {
     const status = prompt(
-      locale === "en" ? "New status (pending / processing / shipped / cancelled):" : "ระบุสถานะใหม่ (pending / processing / shipped / cancelled):",
+      locale === "en" ? "New status (paid / processing / shipped / delivered / cancelled):" : "ระบุสถานะใหม่ (paid / processing / shipped / delivered / cancelled):",
       "shipped"
     );
     if (!status) return;
@@ -134,6 +134,8 @@ export default function AdminOrdersPage() {
                     <td className="px-4 py-4">
                       {o.status === "pending" ? (
                         <span className="px-2 py-1 bg-stone-100 text-stone-600 rounded-md text-xs font-semibold">{locale === "en" ? "Awaiting payment" : "รอชำระเงิน"}</span>
+                      ) : o.status === "payment_pending_review" ? (
+                        <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-md text-xs font-semibold">{locale === "en" ? "Check payment slip" : "รอตรวจสลิป"}</span>
                       ) : o.status === "processing" ? (
                         <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-md text-xs font-semibold">{locale === "en" ? "Preparing shipment" : "เตรียมจัดส่ง"}</span>
                       ) : o.status === "cancelled" ? (

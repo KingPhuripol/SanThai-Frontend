@@ -30,7 +30,7 @@ function LoginForm() {
     try {
       const session = await authApi.login(username, password);
       saveSession(session);
-      if (next && next.startsWith("/")) {
+      if (next && next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\")) {
         router.push(next);
       } else if (session.role === "admin") {
         router.push("/admin/dashboard");

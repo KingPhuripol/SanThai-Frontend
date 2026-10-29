@@ -15,7 +15,6 @@ import {
   Share2,
   CheckCircle2,
   ShieldCheck,
-  Star,
   Maximize2,
   Package,
   Award
@@ -39,6 +38,8 @@ export default function ProductDetailPage() {
   const [orderDone, setOrderDone] = useState(false);
   const [email, setEmail] = useState("");
   const [buyerName, setBuyerName] = useState("");
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
   const [promptpayPayload, setPromptpayPayload] = useState("");
   const [orderId, setOrderId] = useState<number | null>(null);
@@ -115,8 +116,8 @@ export default function ProductDetailPage() {
       router.push(`/login?next=/marketplace/${id}`);
       return;
     }
-    if (!email || !buyerName) {
-      setError(locale === "en" ? "Please enter your name and email." : "กรุณากรอกชื่อและอีเมล");
+    if (!email || !buyerName || address.trim().length < 10 || !phone.trim()) {
+      setError(locale === "en" ? "Please enter your name, email, phone and full shipping address." : "กรุณากรอกชื่อ อีเมล เบอร์โทร และที่อยู่จัดส่งให้ครบ");
       return;
     }
     setOrdering(true);
@@ -127,6 +128,8 @@ export default function ProductDetailPage() {
         product_id: Number(id),
         buyer_email: email,
         buyer_name: buyerName,
+        buyer_address: address.trim(),
+        buyer_phone: phone.trim(),
         quantity: qty,
       });
       setPromptpayPayload(res.promptpay_payload);
@@ -161,14 +164,9 @@ export default function ProductDetailPage() {
     );
   }
 
-  // Mocking extra images for the gallery if backend doesn't provide enough
-  const productImages = product.images?.length ? product.images : [
-    product.fabric?.image_url || "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_01.jpg",
-    "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_amnat_charoen_01.jpg",
-    "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_01.jpg",
-    "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_02.jpg",
-    "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_amnat_charoen_046.jpg",
-  ];
+  const productImages = product.images?.length
+    ? product.images
+    : [product.fabric?.image_url || "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_01.jpg"];
 
   const mainImage = productImages[activeImageIndex];
 
@@ -387,9 +385,14 @@ export default function ProductDetailPage() {
                   {!isLoggedIn && (
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       <input type="text" placeholder="ชื่อผู้ซื้อ" value={buyerName} onChange={(e) => setBuyerName(e.target.value)} className="w-full px-4 py-3 text-sm rounded-xl border border-brand-200 focus:outline-none focus:border-brand-900 focus:ring-1 focus:ring-brand-900 bg-white" />
-                      <input type="email" placeholder="อีเมล" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 text-sm rounded-xl border border-brand-200 focus:outline-none focus:border-brand-900 focus:ring-1 focus:ring-brand-900 bg-white" />
+                      <input type="email" placeholder={locale === "en" ? "Email" : "อีเมล"} value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 text-sm rounded-xl border border-brand-200 focus:outline-none focus:border-brand-900 focus:ring-1 focus:ring-brand-900 bg-white" />
                     </div>
                   )}
+                  {/* Shipping details are needed whether or not name/email came from the session */}
+                  <div className="grid grid-cols-1 gap-3 mb-4">
+                    <input type="tel" autoComplete="tel" placeholder={locale === "en" ? "Phone" : "เบอร์โทรศัพท์"} value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 text-sm rounded-xl border border-brand-200 focus:outline-none focus:border-brand-900 focus:ring-1 focus:ring-brand-900 bg-white" />
+                    <textarea autoComplete="street-address" rows={3} placeholder={locale === "en" ? "Shipping address" : "ที่อยู่จัดส่ง (บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์)"} value={address} onChange={(e) => setAddress(e.target.value)} className="w-full px-4 py-3 text-sm rounded-xl border border-brand-200 focus:outline-none focus:border-brand-900 focus:ring-1 focus:ring-brand-900 bg-white" />
+                  </div>
 
                   {error && <p className="text-xs text-red-500 mb-4 bg-red-50 p-2 rounded-lg">{error}</p>}
 
@@ -429,11 +432,13 @@ export default function ProductDetailPage() {
             <div className="bg-[#FAF6ED] rounded-[24px] p-6 shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-24 bg-brand-900" />
               <div className="relative flex justify-center mb-4 mt-8">
-                <div className="w-24 h-24 rounded-full border-4 border-[#FAF6ED] overflow-hidden bg-brand-200 relative shadow-lg">
-                  <Image src="https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_01.jpg" alt="Artisan" fill sizes="96px" className="object-cover" />
-                  <div className="absolute bottom-0 right-0 w-6 h-6 bg-blue-500 rounded-full border-2 border-[#FAF6ED] flex items-center justify-center text-white">
-                    <CheckCircle2 size={12} strokeWidth={3} />
-                  </div>
+                <div className="w-24 h-24 rounded-full border-4 border-[#FAF6ED] bg-brand-200 relative shadow-lg flex items-center justify-center text-3xl font-bold text-brand-900">
+                  {(product.artisan?.name || "ส").charAt(0)}
+                  {product.artisan?.verified && (
+                    <div className="absolute bottom-0 right-0 w-6 h-6 bg-blue-500 rounded-full border-2 border-[#FAF6ED] flex items-center justify-center text-white">
+                      <CheckCircle2 size={12} strokeWidth={3} />
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -444,24 +449,6 @@ export default function ProductDetailPage() {
                 <p className="text-sm text-brand-900/50 flex items-center justify-center gap-1 mt-1">
                   <MapPin size={12} className="text-gold-500" /> {product.community?.province ? `จ.${product.community.province}` : (product.artisan?.province ? `จ.${product.artisan.province}` : (locale === "en" ? "Thailand" : "ประเทศไทย"))}
                 </p>
-              </div>
-
-              <div className="grid grid-cols-3 gap-1 border-y border-brand-200/50 py-3 mb-6 text-center">
-                <div>
-                  <p className="text-xs font-bold text-brand-900 flex items-center justify-center gap-1">
-                    <Star size={12} className="text-gold-500 fill-gold-500" />
-                    5.0
-                  </p>
-                  <p className="text-[10px] text-brand-900/50 mt-0.5">คะแนนร้าน</p>
-                </div>
-                <div className="border-x border-brand-200/50">
-                  <p className="text-xs font-bold text-brand-900">{(product.artisan as any)?.sales_count || 18} ผืน</p>
-                  <p className="text-[10px] text-brand-900/50 mt-0.5">ยอดขาย</p>
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-brand-900">{(product.artisan as any)?.years_joined || 1} ปี</p>
-                  <p className="text-[10px] text-brand-900/50 mt-0.5">เข้าร่วม</p>
-                </div>
               </div>
 
               <Link href={product.artisan?.id ? `/storefront/${product.artisan.id}` : "/community"} className="flex items-center justify-center w-full py-3 bg-white border border-brand-200 rounded-xl text-sm font-bold text-brand-900 hover:border-brand-900 transition-colors mb-6 shadow-sm">
@@ -601,28 +588,10 @@ export default function ProductDetailPage() {
                     </div>
                   </div>
                   
-                  <div>
-                    <h3 className="text-lg font-bold text-brand-900 mb-6 flex items-center justify-between">
-                      กระบวนการทอผ้า
-                      <Link href={product.passport?.code ? `/passport/${product.passport.code}` : `/fabric/${product.fabric_id}`} className="text-xs font-medium text-brand-900/50 bg-white border border-brand-200 px-4 py-2 rounded-full hover:border-brand-900 transition-colors">ดูเบื้องหลังทั้งหมด</Link>
-                    </h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      {[
-                        { img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_01.jpg", t: product.title_th?.includes("ฝ้าย") ? "1. คัดสรรเส้นฝ้าย" : "1. คัดสรรเส้นไหม" },
-                        { img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_amnat_charoen.jpg", t: "2. ย้อมสีธรรมชาติ" },
-                        { img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_image_02.jpg", t: "3. มัดหมี่ด้วยมือ" },
-                        { img: "https://shqgmstbrwkxycyellgn.supabase.co/storage/v1/object/public/santhai/seed-migration/2026-07-18/thai_fabric_amnat_charoen_01.jpg", t: "4. ทอด้วยความประณีต" },
-                      ].map((step, i) => (
-                        <div key={i} className="group cursor-pointer">
-                          <div className="relative aspect-video rounded-xl overflow-hidden bg-brand-100 mb-2">
-                            <Image src={step.img} alt={step.t} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover group-hover:scale-110 transition-transform duration-500" />
-                            <div className="absolute inset-0 bg-brand-900/10 group-hover:bg-transparent transition-colors" />
-                          </div>
-                          <p className="text-[11px] font-bold text-brand-900 group-hover:text-gold-600 transition-colors">{step.t}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <Link href={product.passport?.code ? `/passport/${product.passport.code}` : `/fabric/${product.fabric_id}`} className="block rounded-xl border border-brand-200 bg-white p-4 hover:border-brand-900 transition-colors">
+                    <p className="text-sm font-bold text-brand-900">{locale === "en" ? "Story & provenance of this piece" : "เรื่องราวและที่มาของผ้าผืนนี้"}</p>
+                    <p className="text-xs text-brand-900/50 mt-1">{locale === "en" ? "Who wove it, where, and every recorded step" : "ใครทอ ทอที่ไหน และทุกขั้นตอนที่บันทึกไว้"}</p>
+                  </Link>
                 </div>
               )}
               

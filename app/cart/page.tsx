@@ -30,6 +30,8 @@ export default function CartPage() {
   const [ordering, setOrdering] = useState(false);
   const [orderDone, setOrderDone] = useState(false);
   const [buyerName, setBuyerName] = useState("");
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [promptpayPayload, setPromptpayPayload] = useState("");
@@ -43,8 +45,8 @@ export default function CartPage() {
       router.push("/login?next=/cart");
       return;
     }
-    if (!email || !buyerName) {
-      setError(locale === "en" ? "Please enter your name and email." : "กรุณากรอกชื่อและอีเมล");
+    if (!email || !buyerName || address.trim().length < 10 || !phone.trim()) {
+      setError(locale === "en" ? "Please enter your name, email, phone and full shipping address." : "กรุณากรอกชื่อ อีเมล เบอร์โทร และที่อยู่จัดส่งให้ครบ");
       return;
     }
     setOrdering(true);
@@ -54,7 +56,8 @@ export default function CartPage() {
       const payload = {
         buyer_name: buyerName,
         buyer_email: email,
-        buyer_address: "-",
+        buyer_address: address.trim(),
+        buyer_phone: phone.trim(),
         items: items.map(item => ({ product_id: item.id, quantity: item.qty }))
       };
       const res = await productsApi.checkoutCart(payload);
@@ -263,6 +266,22 @@ export default function CartPage() {
                     placeholder={locale === "en" ? "Email" : "อีเมล"}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-xl border border-amber-200 focus:outline-none focus:ring-2 focus:ring-gold-400"
+                  />
+                  <input
+                    type="tel"
+                    autoComplete="tel"
+                    placeholder={locale === "en" ? "Phone" : "เบอร์โทรศัพท์"}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-xl border border-amber-200 focus:outline-none focus:ring-2 focus:ring-gold-400"
+                  />
+                  <textarea
+                    autoComplete="street-address"
+                    rows={3}
+                    placeholder={locale === "en" ? "Shipping address" : "ที่อยู่จัดส่ง (บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์)"}
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
                     className="w-full px-3 py-2 text-sm rounded-xl border border-amber-200 focus:outline-none focus:ring-2 focus:ring-gold-400"
                   />
                   {error && <p className="text-xs text-red-500">{error}</p>}

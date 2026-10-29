@@ -226,38 +226,9 @@ export default function QuizPage() {
         gender: finalAnswers.gender || "unisex",
       });
       
-      const demoRec: Recommendation = {
-        fabric_id: 1,
-        product_id: 1,
-        name_th: "ผ้าฝ้ายทอมือย้อมครามธรรมชาติ ลายดาวล้อมคราม",
-        name_en: "Handwoven Natural Indigo Cotton Fabric",
-        province: "สกลนคร",
-        artisan_name: "แม่บัวบาน ศรีวิเศษ",
-        price_thb: 3800,
-        price_usd: 110,
-        match_score: 0.99,
-        image_url: "/demo/fabric.png",
-        reason: "ผ้าฝ้ายทอมือย้อมครามธรรมชาติโทนสีน้ำเงินลุ่มลึก ย้อมครามแท้จากภูมิปัญญาพื้นบ้าน ลายทอละเอียดประณีต แมตช์กับบุคลิกและตัวตนของคุณอย่างสมบูรณ์แบบ 10000%",
-        cultural_meaning_th: "สื่อถึงความสงบ ลุ่มลึก และปัญญาของภูมิปัญญาย้อมครามสกลนคร",
-      };
-
-      const otherRecs = (recs.recommendations || []).filter(r => r.product_id !== 1);
-      setResults([demoRec, ...otherRecs]);
+      setResults(recs.recommendations || []);
     } catch {
-      setResults([{
-        fabric_id: 1,
-        product_id: 1,
-        name_th: "ผ้าฝ้ายทอมือย้อมครามธรรมชาติ ลายดาวล้อมคราม",
-        name_en: "Handwoven Natural Indigo Cotton Fabric",
-        province: "สกลนคร",
-        artisan_name: "แม่บัวบาน ศรีวิเศษ",
-        price_thb: 3800,
-        price_usd: 110,
-        match_score: 0.99,
-        image_url: "/demo/fabric.png",
-        reason: "ผ้าฝ้ายทอมือย้อมครามธรรมชาติโทนสีน้ำเงินลุ่มลึก ย้อมครามแท้จากภูมิปัญญาพื้นบ้าน ลายทอละเอียดประณีต แมตช์กับบุคลิกและตัวตนของคุณอย่างสมบูรณ์แบบ 10000%",
-        cultural_meaning_th: "สื่อถึงความสงบ ลุ่มลึก และปัญญาของภูมิปัญญาย้อมครามสกลนคร",
-      }]);
+      setResults([]);
     } finally {
       setLoading(false);
     }

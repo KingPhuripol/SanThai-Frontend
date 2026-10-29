@@ -83,30 +83,13 @@ export default function FabricVerificationPage() {
       }
       setResult(res as RecognitionResult);
     } catch (err: any) {
-      setResult({
-        vision_analysis: {
-          fabric_type_th: "ผ้ามัดหมี่ / ผ้าฝ้ายย้อมครามธรรมชาติ",
-          pattern_name_th: "ลายดาวล้อมคราม / ลายขอเจ้าฟ้าฯ",
-          weave_technique: "การทอมือแบบขิดและมัดหมี่",
-          fiber_type: "ฝ้ายย้อมครามธรรมชาติ 100%",
-          colors: ["คราม", "น้ำเงิน", "ทอง"],
-          region_guess: "ภาคอีสาน",
-          province_guess: "สกลนคร / ขอนแก่น",
-          cultural_meaning_th: "ลวดลายมงคลสืบทอดจากภูมิปัญญาพื้นบ้าน สะท้อนความพิถีพิถันของการมัดหมี่และการย้อมครามธรรมชาติ มีคุณค่าทางวัฒนธรรมและความประณีตสูง",
-          description_th: "ผลการวิเคราะห์ด้วย AI Vision พบว่าภาพถ่ายเป็นผืนผ้าทอมือทรงคุณค่า มีเอกลักษณ์ลวดลายและเส้นใยประณีต ตรงตามมาตรฐานผ้าไทยยืนยันแล้ว",
-          confidence: 0.94,
-        },
-        matches: [
-          {
-            fabric_id: 1,
-            name_th: "ผ้าฝ้ายทอมือย้อมครามธรรมชาติ ลายดาวล้อมคราม",
-            name_en: "Handwoven Natural Indigo Cotton Fabric",
-            image_url: "/demo/fabric.png",
-            weave_technique: "มัดหมี่ทอมือ",
-          }
-        ],
-        needs_human_review: false,
-      });
+      // Never show a made-up result on an authenticity screen.
+      const unavailable = err?.response?.status === 503 || err?.response?.status === 429;
+      setError(
+        locale === "en"
+          ? unavailable ? "Fabric recognition is busy or unavailable. Please try again shortly." : "We couldn't analyze this image. Try a clearer, well-lit photo of the fabric."
+          : unavailable ? "ระบบวิเคราะห์ผ้าไม่พร้อมใช้งานชั่วคราว กรุณาลองใหม่อีกครั้ง" : "วิเคราะห์ภาพนี้ไม่ได้ ลองถ่ายผ้าให้ชัดและมีแสงเพียงพอ"
+      );
     } finally {
       setIsScanning(false);
     }
@@ -122,8 +105,8 @@ export default function FabricVerificationPage() {
       setError(locale === "en" ? "Choose a valid image file." : "กรุณาเลือกไฟล์รูปภาพ JPG, PNG, WEBP หรือ HEIC");
       return;
     }
-    if (image.size > 15 * 1024 * 1024) {
-      setError(locale === "en" ? "Images must be 15 MB or smaller." : "รูปภาพต้องมีขนาดไม่เกิน 15 MB");
+    if (image.size > 5 * 1024 * 1024) {
+      setError(locale === "en" ? "Images must be 5 MB or smaller." : "รูปภาพต้องมีขนาดไม่เกิน 5 MB");
       return;
     }
     stopCamera();
@@ -214,7 +197,7 @@ export default function FabricVerificationPage() {
             <div className="mt-8 rounded-2xl border border-amber-100 bg-white p-5 text-sm text-brand-900/70">
               <p className="font-bold text-brand-900">{locale === "en" ? "Tips for a good scan" : "วิธีถ่ายให้ได้ผลดี"}</p>
               <ol className="mt-3 space-y-2 text-sm leading-6">
-                {locale === "en" ? <><li>1. Use natural light and avoid glare.</li><li>2. Show the pattern and fibres in close-up.</li><li>3. Use a JPG, PNG, WEBP, or HEIC image up to 15 MB.</li></> : <><li>1. ใช้แสงสว่างธรรมชาติและหลีกเลี่ยงแสงสะท้อน</li><li>2. ให้เห็นลวดลายและเส้นใยในระยะใกล้</li><li>3. ใช้รูป JPG, PNG, WEBP หรือ HEIC ขนาดไม่เกิน 15 MB</li></>}
+                {locale === "en" ? <><li>1. Use natural light and avoid glare.</li><li>2. Show the pattern and fibres in close-up.</li><li>3. Use a JPG, PNG, WEBP, or HEIC image up to 5 MB.</li></> : <><li>1. ใช้แสงสว่างธรรมชาติและหลีกเลี่ยงแสงสะท้อน</li><li>2. ให้เห็นลวดลายและเส้นใยในระยะใกล้</li><li>3. ใช้รูป JPG, PNG, WEBP หรือ HEIC ขนาดไม่เกิน 5 MB</li></>}
               </ol>
             </div>
           </div>
@@ -241,7 +224,7 @@ export default function FabricVerificationPage() {
                   ) : (
                     <button onClick={() => inputRef.current?.click()} className="flex h-full w-full flex-col items-center justify-center p-6 text-center hover:bg-brand-100/60">
                       <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-gold-600 shadow-sm"><ImagePlus size={26} /></span>
-                      <p className="mt-4 font-bold">{locale === "en" ? "Choose a textile image" : "เลือกรูปผ้าจากอุปกรณ์"}</p><p className="mt-1 text-sm text-brand-900/50">JPG, PNG, WEBP, HEIC · {locale === "en" ? "up to" : "ไม่เกิน"} 15 MB</p>
+                      <p className="mt-4 font-bold">{locale === "en" ? "Choose a textile image" : "เลือกรูปผ้าจากอุปกรณ์"}</p><p className="mt-1 text-sm text-brand-900/50">JPG, PNG, WEBP, HEIC · {locale === "en" ? "up to" : "ไม่เกิน"} 5 MB</p>
                     </button>
                   )}
                   {isScanning && <div className="absolute inset-0 flex flex-col items-center justify-center bg-brand-900/75 text-center text-white"><Loader2 className="animate-spin text-gold-400" size={36} /><p className="mt-4 font-bold">{locale === "en" ? "Analysing with AI" : "กำลังวิเคราะห์ด้วย AI"}</p><p className="mt-1 text-sm text-white/70">{locale === "en" ? "Searching related records in the database" : "กำลังค้นหารายการที่เกี่ยวข้องในฐานข้อมูล"}</p></div>}

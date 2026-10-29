@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import ChatWidget from "@/components/ChatWidget";
 import TrafficTracker from "@/components/TrafficTracker";
 import { LanguageProvider } from "@/components/LanguageProvider";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 export const metadata: Metadata = {
   title: "สานไทย — ถักทอภูมิปัญญาไทย สู่โลกดิจิทัล",
@@ -16,7 +17,11 @@ export const metadata: Metadata = {
     description: "Connect Thai textile heritage to the modern market",
     type: "website",
   },
+  appleWebApp: { capable: true, title: "สานไทย", statusBarStyle: "black-translucent" },
+  icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
 };
+
+export const viewport: Viewport = { themeColor: "#2B1B41" };
 
 import Footer from "@/components/Footer";
 
@@ -42,6 +47,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <main className="min-h-screen">{children}</main>
           <Footer />
           <ChatWidget />
+          <ServiceWorkerRegister />
         </LanguageProvider>
       </body>
     </html>

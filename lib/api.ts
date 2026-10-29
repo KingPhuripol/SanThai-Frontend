@@ -147,11 +147,12 @@ export const productsApi = {
     product_id: number;
     buyer_email: string;
     buyer_name?: string;
-    buyer_address?: string;
+    buyer_address: string;
+    buyer_phone?: string;
     quantity?: number;
     variant_id?: number;
   }): Promise<any> => {
-    const { data } = await api.post("/api/products/orders", null, { params });
+    const { data } = await api.post("/api/products/orders", params);
     return data;
   },
 
@@ -245,6 +246,7 @@ export const artisanApi = {
     status: string;
     tracking_number?: string;
     courier?: string;
+    reason?: string;
   }): Promise<any> => {
     const { data } = await api.put(`/api/artisan/orders/${orderId}/status`, updateData);
     return data;
@@ -308,6 +310,7 @@ export const designerApi = {
     status: string;
     tracking_number?: string;
     courier?: string;
+    reason?: string;
   }): Promise<any> => {
     const { data } = await api.put(`/api/designer/orders/${orderId}/status`, updateData);
     return data;
@@ -371,6 +374,7 @@ export const adminApi = {
     status: string;
     tracking_number?: string;
     courier?: string;
+    reason?: string;
   }): Promise<any> => {
     const { data } = await api.put(`/api/admin/orders/${orderId}/status`, updateData);
     return data;

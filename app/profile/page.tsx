@@ -20,6 +20,7 @@ export default function ProfilePage() {
     full_name: "",
     email: "",
     password: "",
+    current_password: "",
     community_name: "",
     province: "",
     region: "",
@@ -36,6 +37,7 @@ export default function ProfilePage() {
         full_name: s.full_name || "",
         email: s.email || "",
         password: "",
+        current_password: "",
         community_name: s.artisan_name || "",
         province: "",
         region: "",
@@ -81,6 +83,9 @@ export default function ProfilePage() {
       if (form.password) {
         payload.password = form.password;
       }
+      if (form.current_password) {
+        payload.current_password = form.current_password;
+      }
       
       if (session?.role === "artisan") {
         payload.community_name = form.community_name;
@@ -93,7 +98,7 @@ export default function ProfilePage() {
       saveSession(updatedSession);
       setSession(updatedSession);
       
-      setForm(f => ({ ...f, password: "" }));
+      setForm(f => ({ ...f, password: "", current_password: "" }));
       setSuccess(locale === "en" ? "Profile updated successfully." : "อัปเดตข้อมูลร้านค้า/โปรไฟล์สำเร็จ");
     } catch (err: any) {
       setError(err?.response?.data?.detail || (locale === "en" ? "Failed to update profile." : "ไม่สามารถอัปเดตข้อมูลได้"));
@@ -244,6 +249,28 @@ export default function ProfilePage() {
               />
             </div>
           </div>
+
+          {(form.password || form.email !== session?.email) && (
+            <div>
+              <label className="block text-sm font-semibold text-brand-900 mb-2">
+                {locale === "en" ? "Current password" : "รหัสผ่านปัจจุบัน"}
+                <span className="text-stone-400 font-normal ml-2">
+                  {locale === "en" ? "(Required to change email or password)" : "(จำเป็นเมื่อเปลี่ยนอีเมลหรือรหัสผ่าน)"}
+                </span>
+              </label>
+              <div className="relative">
+                <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
+                <input
+                  type="password"
+                  autoComplete="current-password"
+                  value={form.current_password}
+                  onChange={(e) => set("current_password", e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full pl-11 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                />
+              </div>
+            </div>
+          )}
 
           <div className="pt-4 border-t border-stone-100 flex justify-end gap-3">
             <button
